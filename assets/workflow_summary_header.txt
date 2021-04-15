@@ -1,0 +1,6 @@
+id: 'workflow_summary'
+description: "This section summarizes important parameters used in the pipeline. They were collected at each step of the pipeline."
+section_name: 'Workflow Summary'
+plot_type: 'html'
+data: |
+    <dl class="dl-horizontal">
