@@ -287,7 +287,7 @@ workflow RNASEQ {
     gprofiler_locations = gprofiler.out.download.flatten().map { "${params.outdir}/gProfiler/" + it.getName() }
     report_locations = multiqc.out.report.map { "${params.outdir}/MultiQC/" + it.getName() }
     bam_locations
-        .mix(fastq_locations, counts_locations, deseq2_locations, gprofiler_locations, report_locations)
+        .mix(counts_locations, deseq2_locations, gprofiler_locations, report_locations)
         .collectFile(name: "${params.outdir}/download_data/file_locations.txt", newLine: true )
         .set { locations }
 
