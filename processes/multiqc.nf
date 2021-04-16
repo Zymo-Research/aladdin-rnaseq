@@ -35,7 +35,7 @@ process multiqc {
     path workflow_summary
 
     output:
-    path "*multiqc_report.html"
+    path "*multiqc_report.html", emit: report
     path "*report_data"
     //path "multiqc_plots"
 
@@ -84,7 +84,7 @@ process multiqc_3mrna {
     path workflow_summary
 
     output:
-    path "*multiqc_report.html"
+    path "*multiqc_report.html", emit: report
     path "*report_data"
     //path "multiqc_plots"
 
@@ -121,7 +121,7 @@ process multiqc_comparison_only {
     path workflow_summary
 
     output:
-    path "*multiqc_report.html"
+    path "*multiqc_report.html", emit: report
     path "*report_data"
     //path "multiqc_plots"
 

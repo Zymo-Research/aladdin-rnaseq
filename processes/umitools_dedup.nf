@@ -3,7 +3,10 @@ params.publish_dir = "./umidedup"
 params.csi_index = false
 
 process umi_dedup {
-    label 'mid_memory'
+    label 'umi_Dedup'
+    errorStrategy 'retry'
+    maxRetries 1
+    tag "${meta.name}"
     publishDir "${params.publish_dir}", mode: 'copy',
         saveAs: {filename -> 
             if (filename.indexOf("dedup_LOGFILE") > 0) "logs/$filename"

@@ -3,7 +3,8 @@
 params.publish_dir = "./umiextract"
 
 process umi_extract {
-    label 'mid_memory'
+    errorStrategy 'retry'
+    maxRetries 1
     tag "${meta.name}"
     publishDir "${params.publish_dir}", mode: 'copy',
         saveAs: { filename -> if (filename.indexOf("umiextract_report.txt") > 0) "logs/$filename" else null }

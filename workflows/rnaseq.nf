@@ -190,6 +190,9 @@ include { multiqc } from "../processes/multiqc" addParams(
     gprofiler_fdr: params.gprofiler_fdr,
     ignore_R1: params.ignore_R1
 )
+include { summarize_downloads } from "../processes/summarize_downloads" addParams(
+    publish_dir: "${params.outdir}/download_data"
+)
 
 /*
  * WORKFLOW DEFINITION
@@ -244,20 +247,6 @@ workflow RNASEQ {
     deseq2(merge_featurecounts.out.merged_counts, check_design.out.checked_design, comparisons.ifEmpty([]))
     gprofiler(deseq2.out.results)
 
-    // Generate download links
-    bam_locations = mark_duplicates.out.bam
-                        .map { meta, bam, bai -> "${params.outdir}/MarkDuplicates/" + bam.getName() }
-    counts_locations = merge_featurecounts.out.merged_counts.map { "${params.outdir}/featureCounts/" + it.getName() }
-    deseq2_locations = deseq2.out.download.flatten().map { "${params.outdir}/DESeq2/" + it.getName() }
-    gprofiler_locations = gprofiler.out.download.flatten().map { "${params.outdir}/gProfiler/" + it.getName() }
-    locations = bam_locations
-                    .mix(fastq_locations, counts_locations, deseq2_locations, gprofiler_locations)
-                    .collectFile(name: "${params.outdir}/download_data/file_locations.txt", newLine: true )
-    // Save md5sum into one file
-    mark_duplicates.out.md5sum
-        .mix(star.out.md5sum)
-        .collectFile(name: "${params.outdir}/download_data/md5sum.txt", sort: { it.getName() } )
-
     // Software versions
     versions = fastqc.out.version.first()
                    .mix(trim_galore.out.version.first(), star.out.version.first(), preseq.out.version.first(), mark_duplicates.out.version.first(),
@@ -284,6 +273,32 @@ workflow RNASEQ {
             software_versions.out.report.collect(), \
             summary_header, \
             workflow_summary_to_report)
+
+    // Gather locations of files to download
+    if (params.skip_markduplicates) {
+        bam_locations = star.out.bam
+                            .map { meta, star_log, bam, bai -> "${params.outdir}/STAR/" + bam.getName() }
+    } else {
+        bam_locations = mark_duplicates.out.bam
+                            .map { meta, bam, bai -> "${params.outdir}/MarkDuplicates/" + bam.getName() }
+    }
+    counts_locations = merge_featurecounts.out.merged_counts.map { "${params.outdir}/featureCounts/" + it.getName() }
+    deseq2_locations = deseq2.out.download.flatten().map { "${params.outdir}/DESeq2/" + it.getName() }
+    gprofiler_locations = gprofiler.out.download.flatten().map { "${params.outdir}/gProfiler/" + it.getName() }
+    report_locations = multiqc.out.report.map { "${params.outdir}/MultiQC/" + it.getName() }
+    bam_locations
+        .mix(fastq_locations, counts_locations, deseq2_locations, gprofiler_locations, report_locations)
+        .collectFile(name: "${params.outdir}/download_data/file_locations.txt", newLine: true )
+        .set { locations }
+
+    // Save md5sum into one file
+    mark_duplicates.out.md5sum
+        .mix(star.out.md5sum)
+        .collectFile(name: "${params.outdir}/download_data/md5sum.txt", sort: { it.getName() } )
+        .set { md5sums }
+    
+    // Parse the list of files for downloading into a JSON file
+    summarize_downloads( locations, md5sums, check_design.out.checked_design )
 }
 
 /*

@@ -102,8 +102,10 @@ if (length(grouping$sample) > 2) {
 
 # Carry out DGE analysis if there are at least 2 groups with replicates
 if (length(groups) > 1) {
+    # Remove groups with no replicates and carry out DEG analysis
+    dds <- dds[,colData(dds)$group %in% groups]
     dds <- DESeq(dds)
-    # Remove groups with less 2 replicates and calculate geomean of transformed counts per group
+    # Remove groups with no replicates and calculate geomean of transformed counts per group
     transformed <- transformed[,colData(transformed)$group %in% groups]
     transMeanPerLvl <- sapply(levels(transformed$group), function(lvl) rowMeans(assay(transformed)[,transformed$group==lvl]))
     transMeanPerLvl <- as.data.frame(2**transMeanPerLvl)

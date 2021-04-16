@@ -78,6 +78,9 @@ include { multiqc_comparison_only } from "../processes/multiqc" addParams(
     deseq2_fdr: params.deseq2_fdr,
     gprofiler_fdr: params.gprofiler_fdr
 )
+include { summarize_downloads } from "../processes/summarize_downloads" addParams(
+    publish_dir: "${params.outdir}/download_data"
+)
 
 /*
  * WORKFLOW DEFINITION
@@ -90,13 +93,6 @@ workflow COMPARISON {
     deseq2(merged_counts, check_design.out.checked_design, comparisons.ifEmpty([]))
     gprofiler(deseq2.out.results)
 
-    // Generate download links
-    deseq2_locations = deseq2.out.download.flatten().map { "${params.outdir}/DESeq2/" + it.getName() }
-    gprofiler_locations = gprofiler.out.download.flatten().map { "${params.outdir}/gProfiler/" + it.getName() }
-    locations = deseq2_locations
-                    .mix(gprofiler_locations)
-                    .collectFile(name: "${params.outdir}/download_data/file_locations.txt", newLine: true )
-
     // Software versions
     versions = deseq2.out.version.mix(gprofiler.out.version)
     software_versions(versions.collect())
@@ -108,6 +104,18 @@ workflow COMPARISON {
                             software_versions.out.report.collect(), \
                             summary_header, \
                             workflow_summary_to_report)
+
+    // Generate download links
+    deseq2_locations = deseq2.out.download.flatten().map { "${params.outdir}/DESeq2/" + it.getName() }
+    gprofiler_locations = gprofiler.out.download.flatten().map { "${params.outdir}/gProfiler/" + it.getName() }
+    report_locations = multiqc.out.report.map { "${params.outdir}/MultiQC/" + it.getName() }
+    deseq2_locations
+        .mix(gprofiler_locations, report_locations)
+        .collectFile(name: "${params.outdir}/download_data/file_locations.txt", newLine: true )
+        .set { locations }
+
+    // Parse the list of files for downloading into a JSON file
+    summarize_downloads( locations, [], check_design.out.checked_design )
 }
 
 /*
