@@ -32,18 +32,6 @@ def collect_summary(params, workflow) {
         if (params.ercc_spikein) {
             summary['ERCC spike-in']     = "ERCC92 Mix $params.ercc_spikein"
         }
-        presets = [ "zymo_ribofree" : [ "trimming": "5'R2: 10bp / adapter1: NNNNNNNNNNAGATCGGAAGAGCACACGTCTGAACTCCAGTCAC / adapter2: AGATCGGAAGAGCGTCGTGTAGGGAAAGA",
-                                        "strandedness":'Reverse', "kit_name": 'Zymo-Seq RiboFree Total RNA Library Kit'], 
-                    "zymo_3mrna"    : ["trimming" : "5'R1: 10bp / adapter:AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT", "strandedness": 'Forward',
-                                        "kit_name": "Zymo-Seq 3' mRNA Library Kit"],
-                    "zymo_3mrna_nodedup" : [ "trimming": "5'R1: 10bp / adapter:AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT", "strandedness": 'Forward',
-                                        "kit_name": "Zymo-Seq 3' mRNA Library Kit"],
-                    "illumina"      : [ "trimming": "only using Illumina adatpers", "strandedness":'None', "kit_name": "Illumina RNA kits"],
-                    "pico"          : [ "trimming": "5'R1: 3bp / 3'R2: 3bp / Illumina adapters", "strandedness":'Forward', "kit_name": "SMARTer Stranded Total RNA-Seq Kit - Pico Input"]
-        ]
-        summary['Trimming']              = presets[params.protocol]['trimming']
-        summary['Strandedness']          = presets[params.protocol]['strandedness']
-        summary['Library Prep']          = presets[params.protocol]['kit_name']
     }
     return summary
 }

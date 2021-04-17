@@ -6,7 +6,7 @@ Workflow of standard RNAseq
 params.summary = [:]
 
 // Load functions
-include { parse_presets } from ('../libs/parse_presets')
+include { parse_protocol } from ('../libs/parse_protocol')
 include { setup_channel } from ('../libs/setup_channel')
 include { check_star_log } from ('../libs/check_star_log')
 include { parse_design; parse_design as parse_design_original_fastq } from ('../libs/parse_design')
@@ -35,8 +35,11 @@ params.rRNA_gtf = params.genomes[ params.genome ].rRNA_gtf ?: false
 params.bacteria = params.genomes[ params.genome ].bacteria ?: false
 params.csi_index = params.genomes[ params.genome ].csi_index ?: false
 
-// Parse presets.
-params.protocol_settings = parse_presets(params.protocol)
+// Parse protocol
+params.protocol_settings = parse_protocol(params.protocol, params.protocols_path)
+params.summary['Trimming'] = params.protocol_settings['trimming']
+params.summary['Strandedness'] = params.protocol_settings['strandedness']
+params.summary['Library Prep'] = params.protocol_settings['common_name']
 // Ensure correct reads and input channels are set up for zymo-seq 3' mRNA data processing without using UMI to dedup
 params.ignore_R1 = (params.protocol == "zymo_3mrna_nodedup")
 
