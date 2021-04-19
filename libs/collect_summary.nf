@@ -12,6 +12,7 @@ def collect_summary(params, workflow) {
     summary['Design']                    = params.design
     summary['Group Comparisons']         = params.comparisons
     summary['Genome']                    = params.genome
+    summary['Protocol']                  = params.protocol
     summary['Save Unaligned']            = params.save_unaligned
     summary['Max Resources']             = "$params.max_memory memory, $params.max_cpus cpus, $params.max_time time per job"
     summary['Output dir']                = params.outdir

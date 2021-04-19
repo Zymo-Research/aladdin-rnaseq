@@ -1,8 +1,9 @@
 // Extract various settings associated with a protocol
 
+import groovy.json.JsonSlurper
+
 def parse_protocol(protocol, protocols_path) {
 
-    import groovy.json.JsonSlurper
     json_slurper = new JsonSlurper()
 
     // load the protocols from the protocol JSON file
