@@ -171,7 +171,7 @@ include { deseq2 } from '../processes/deseq2.nf' addParams(
 )
 include { gprofiler } from '../processes/gprofiler.nf' addParams(
     publish_dir: "${params.outdir}/gProfiler",
-    gprofiler_organism: params.gprofiler,
+    gprofiler_organism: params.genome_settings.gprofiler,
     deseq2_fdr: params.deseq2_fdr,
     gprofiler_fdr: params.gprofiler_fdr
 )
