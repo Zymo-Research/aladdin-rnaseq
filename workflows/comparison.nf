@@ -8,6 +8,7 @@ params.summary = [:]
 // Load functions
 include { setup_channel } from ('../libs/setup_channel')
 include { parse_design } from ('../libs/parse_design')
+include { parse_genome } from ('../libs/parse_genome')
 
 /*
  * SET UP CONFIGURATION VARIABLES
@@ -15,15 +16,11 @@ include { parse_design } from ('../libs/parse_design')
 // Genome options
 // Check if genome exists in the config file
 if (params.genome) {
-    if (!params.genomes.containsKey(params.genome)) {
-        exit 1, "The provided genome '${params.genome}' is not available in the iGenomes file. Currently the available genomes are ${params.genomes.keySet().join(", ")}"
-    }
+    params.genome_settings = parse_genome(params.genome, params.genomes_path, params.public_genomes_only)
 } else {
     log.warn "Genome not provided, gProfiler analysis will be skipped."
+    params.genome_settings = [ 'gprofiler': false, 'ensembl_web': false ]
 }
-// Reference index path configuration
-params.gprofiler_organism = params.genome ? params.genomes[ params.genome ].gprofiler ?: false : false
-params.ensembl_web = params.genome ? params.genomes[ params.genome ].ensembl_web ?: false : false
 
 /*
  * SET & VALIDATE INPUT CHANNELS
@@ -61,7 +58,7 @@ include { deseq2 } from '../processes/deseq2.nf' addParams(
 )
 include { gprofiler } from '../processes/gprofiler.nf' addParams(
     publish_dir: "${params.outdir}/gProfiler",
-    gprofiler_organism: params.gprofiler_organism,
+    gprofiler_organism: params.genome_settings.gprofiler,
     deseq2_fdr: params.deseq2_fdr,
     gprofiler_fdr: params.gprofiler_fdr
 )
@@ -74,7 +71,7 @@ include { multiqc_comparison_only } from "../processes/multiqc" addParams(
     publish_dir: "${params.outdir}/MultiQC",
     skip_multiqc: params.skip_multiqc,
     run_name: params.summary["Run Name"],
-    ensembl_web: params.ensembl_web,
+    ensembl_web: params.genome_settings.ensembl_web,
     deseq2_fdr: params.deseq2_fdr,
     gprofiler_fdr: params.gprofiler_fdr
 )

@@ -7,9 +7,10 @@ params.summary = [:]
 
 // Load functions
 include { parse_protocol } from ('../libs/parse_protocol')
+include { parse_genome; parse_genome as parse_ercc_genome } from ('../libs/parse_genome')
 include { setup_channel } from ('../libs/setup_channel')
 include { check_star_log } from ('../libs/check_star_log')
-include { parse_design; parse_design as parse_design_original_fastq } from ('../libs/parse_design')
+include { parse_design } from ('../libs/parse_design')
 
 /*
  * SET UP CONFIGURATION VARIABLES
@@ -17,23 +18,18 @@ include { parse_design; parse_design as parse_design_original_fastq } from ('../
 // Genome options
 // Check if genome exists in the config file
 if (params.genome) {
-    if (!params.genomes.containsKey(params.genome)) {
-        exit 1, "The provided genome '${params.genome}' is not available in the iGenomes file. Currently the available genomes are ${params.genomes.keySet().join(", ")}"
-    }
+    params.genome_settings = parse_genome(params.genome, params.genomes_path, params.public_genomes_only)
 } else {
     exit 1, "--genome is a required input!"
 }
 
-// Reference index path configuration
-// Define these here - after the profiles are loaded with the iGenomes paths
-params.star_index = params.genomes[ params.genome ].star ?: false
-params.gtf = params.genomes[ params.genome ].gtf ?: false
-params.bed12 = params.genomes[ params.genome ].bed12 ?: false
-params.gprofiler_organism = params.genomes[ params.genome ].gprofiler ?: false
-params.ensembl_web = params.genomes[ params.genome ].ensembl_web ?: false
-params.rRNA_gtf = params.genomes[ params.genome ].rRNA_gtf ?: false
-params.bacteria = params.genomes[ params.genome ].bacteria ?: false
-params.csi_index = params.genomes[ params.genome ].csi_index ?: false
+// ERCC settings
+if (params.ercc_spikein) {
+    if (params.public_genomes_only) {
+        exit 1, "--ercc_spikein and --public_genomes_only cannot be used simultaneously."
+    }
+    params.ercc_settings = parse_ercc_genome('ERCC92', params.genomes_path, params.public_genomes_only)
+}
 
 // Parse protocol
 params.protocol_settings = parse_protocol(params.protocol, params.protocols_path)
@@ -46,15 +42,15 @@ params.ignore_R1 = (params.protocol == "zymo_3mrna_nodedup")
 /*
  * SET & VALIDATE INPUT CHANNELS
  */
-star_index = setup_channel(params.star_index, "STAR index", true, "")
-gtf = setup_channel(params.gtf, "GTF annotation file", true, "")
-bed12 = setup_channel(params.bed12, "BED annotation file", true, "")
-rRNA_gtf = setup_channel(params.rRNA_gtf, "rRNA GTF file", false, "will depend on genome rRNA annotation.")
-ercc_star_index = setup_channel(params.ercc_spikein ? params.genomes['ERCC92'].star : false, "ERCC STAR index", false, "will not look for ERCC reads.")
-ercc_gtf = setup_channel(params.ercc_spikein ? params.genomes['ERCC92'].gtf : false, "ERCC GTF file", false, "will not look for ERCC reads.")
+star_index = setup_channel(params.genome_settings.star, "STAR index", true, "")
+gtf = setup_channel(params.genome_settings.gtf, "GTF annotation file", true, "")
+bed12 = setup_channel(params.genome_settings.bed12, "BED annotation file", true, "")
+rRNA_gtf = setup_channel(params.genome_settings.rRNA_gtf, "rRNA GTF file", false, "will depend on genome rRNA annotation.")
 design = setup_channel(params.design, "design CSV file", true, "")
 comparisons = setup_channel(params.comparisons, "comparison CSV file", false, "all pairwise comparisons will be carried out.")
 multiqc_config = setup_channel(params.multiqc_config, "MultiQC config", true, "")
+ercc_star_index = setup_channel(params.ercc_spikein ? params.ercc_settings.star : false, "ERCC STAR index", false, "will not look for ERCC reads.")
+ercc_gtf = setup_channel(params.ercc_spikein ? params.ercc_settings.gtf : false, "ERCC GTF file", false, "will not look for ERCC reads.")
 ercc_info = setup_channel(params.ercc_spikein ? "$baseDir/assets/ERCC92_info.tsv" : false, "ERCC info", false, "ERCC count will not be conducted.")
 summary_header = Channel.fromPath("$baseDir/assets/workflow_summary_header.txt", checkIfExists: true)
 
@@ -98,8 +94,8 @@ include { star } from '../processes/star' addParams(
     save_unaligned: (params.save_unaligned || params.ercc_spikein), // Also save unaligned if ERCC alignment is requested
     save_secondary_alignments: params.save_secondary_alignments,
     save_bam: params.skip_markduplicates, // Only save bam when markdup is not run
-    csi_index: params.csi_index,
-    bacteria: params.bacteria,
+    csi_index: params.genome_settings.csi_index,
+    bacteria: params.genome_settings.bacteria,
     star_twopass: params.star_twopass,
     star_min_overlap: params.star_min_overlap,
     star_max_overlap_mismatch: params.star_max_overlap_mismatch
@@ -118,8 +114,8 @@ include { rseqc } from '../processes/rseqc' addParams(
     publish_dir: "${params.outdir}/RSeQC",
     skip_qc: params.skip_qc,
     skip_rseqc: params.skip_rseqc,
-    csi_index: params.csi_index,
-    bacteria: params.bacteria
+    csi_index: params.genome_settings.csi_index,
+    bacteria: params.genome_settings.bacteria
 )
 include { preseq } from '../processes/preseq' addParams(
     publish_dir: "${params.outdir}/preseq",
@@ -132,7 +128,7 @@ include { mark_duplicates } from '../processes/mark_duplicates' addParams(
     skip_qc: params.skip_qc,
     skip_markduplicates: params.skip_markduplicates,
     markdup_java_options: params.markdup_java_options,
-    csi_index: params.csi_index
+    csi_index: params.genome_settings.csi_index
 )
 include { dupradar } from '../processes/dupradar' addParams(
     publish_dir: "${params.outdir}/dupRadar",
@@ -175,7 +171,7 @@ include { deseq2 } from '../processes/deseq2.nf' addParams(
 )
 include { gprofiler } from '../processes/gprofiler.nf' addParams(
     publish_dir: "${params.outdir}/gProfiler",
-    gprofiler_organism: params.gprofiler_organism,
+    gprofiler_organism: params.gprofiler,
     deseq2_fdr: params.deseq2_fdr,
     gprofiler_fdr: params.gprofiler_fdr
 )
@@ -188,7 +184,7 @@ include { multiqc } from "../processes/multiqc" addParams(
     publish_dir: "${params.outdir}/MultiQC",
     skip_multiqc: params.skip_multiqc,
     run_name: params.summary["Run Name"],
-    ensembl_web: params.ensembl_web,
+    ensembl_web: params.genome_settings.ensembl_web,
     deseq2_fdr: params.deseq2_fdr,
     gprofiler_fdr: params.gprofiler_fdr,
     ignore_R1: params.ignore_R1

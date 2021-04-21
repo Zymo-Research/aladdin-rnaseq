@@ -26,8 +26,8 @@ def summarize_downloads(locations, md5sum, design):
     file_info = dict()
 
     # Read the md5sum file
+    md5sums = dict()
     if md5sum is not None:
-        md5sums = dict()
         logger.info("Reading md5sum file...")
         with open(md5sum, 'r') as fh:
             for line in fh:
@@ -78,9 +78,9 @@ def summarize_downloads(locations, md5sum, design):
                     file_type, scope = values
                     info['file_type'] = file_type
                     info['scope'] = scope
-                    if file_type in ['samples', 'comparisons']:
+                    if scope in ['samples', 'comparisons']:
                         sname = fn.replace(suffix, '')
-                        if file_type == 'samples':
+                        if scope == 'samples':
                             # Check if the parsed sample name is in the original design
                             if sname in samples:
                                 info['sample'] = sname

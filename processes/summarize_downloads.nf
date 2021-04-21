@@ -2,7 +2,7 @@
 params.publish_dir = 'download_data'
 
 process summarize_downloads {
-    tag "$locations"
+    label 'no_cache'
     publishDir "${params.publish_dir}", mode: 'copy'
 
     input:
