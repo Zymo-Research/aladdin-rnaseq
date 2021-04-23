@@ -3,7 +3,7 @@ params.publish_dir = "Trim_Galore"
 params.save_trimmed = false
 params.protocol_settings = [ "clip_r1":0, "clip_r2":0, "three_prime_clip_r1":0, "three_prime_clip_r2":0,  
                              "adapter":false, "adapter2":false, "strandedness":0 ]
-params.trim_nextseq = 0
+params.trim_nextseq = false
 params.min_read_length = 20
 params.adapter_overlap = 1
 params.skip_trimming = false
@@ -36,7 +36,7 @@ process trim_galore {
     c_r2 = params.protocol_settings.clip_r2 > 0 ? "--clip_r2 ${params.protocol_settings.clip_r2}" : ''
     tpc_r1 = params.protocol_settings.three_prime_clip_r1 > 0 ? "--three_prime_clip_r1 ${params.protocol_settings.three_prime_clip_r1}" : ''
     tpc_r2 = params.protocol_settings.three_prime_clip_r2 > 0 ? "--three_prime_clip_r2 ${params.protocol_settings.three_prime_clip_r2}" : ''
-    nextseq = params.trim_nextseq > 0 ? "--nextseq ${params.trim_nextseq}" : ''
+    nextseq = params.trim_nextseq ? '--nextseq 20' : ''
     a1 = params.protocol_settings.adapter ? "-a ${params.protocol_settings.adapter}" : ''
     a2 = params.protocol_settings.adapter2 ? "-a2 ${params.protocol_settings.adapter2}" : ''
     // Added soft-links to original fastqs for consistent naming in MultiQC

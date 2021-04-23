@@ -2,13 +2,13 @@
     "$schema": "http://json-schema.org/draft-07/schema",
     "$id": "https://raw.githubusercontent.com/Zymo-Research/aladdin-rnaseq/master/nextflow_schema.json",
     "title": "Zymo-Research/aladdin-rnaseq pipeline parameters",
-    "description": "Nextflow RNA-Seq analysis pipeline, part of the Zymo Research bioinformatics pipeline catalog.",
+    "description": "Nextflow RNA-Seq analysis pipeline, part of the Zymo Research bioinformatics pipeline catalog",
     "type": "object",
     "definitions": {
         "input_output_options": {
             "title": "Input/output options",
             "type": "object",
-            "description": "Define where the pipeline should find input data and save output data.",
+            "description": "Define where the pipeline should find input data and save output data",
             "properties": {
                 "design": {
                     "type": "string",
@@ -22,7 +22,7 @@
                 },
                 "outdir": {
                     "type": "string",
-                    "description": "The output directory where the results will be saved.",
+                    "description": "The output directory where the results will be saved",
                     "default": "./results",
                     "hidden": true
                 }
@@ -32,7 +32,7 @@
         "reference_genome_options": {
             "title": "Reference genome options",
             "type": "object",
-            "description": "Options for the reference genome indices used to align reads.",
+            "description": "Options for the reference genome indices used to align reads",
             "properties": {
                 "genome": {
                     "type": "string",
@@ -56,7 +56,7 @@
                 "ercc_spikein": {
                     "type": "integer",
                     "enum": [0, 1, 2],
-                    "description": "Whether ERCC spike-in was used. Choose 0 if not used. Choose 1 or 2 for Mixture 1 or 2, respectively.",
+                    "description": "Whether ERCC spike-in was used. Choose 0 if not used. Choose 1 or 2 for Mixture 1 or 2, respectively",
                     "default": 0,
                     "hidden": false,
                     "advanced": true
@@ -67,9 +67,358 @@
         "read_trimming_options": {
             "title": "Read trimming options",
             "type": "object",
-            "description": "Options to adjust read trimming criteria.",
+            "description": "Options to adjust read trimming criteria",
             "properties": {
+                "protocol": {
+                    "type": "string",
+                    "description": "Library prep protocol/kit used",
+                    "hidden": false,
+                    "advanced": false,
+                    "choices_json": "https://raw.githubusercontent.com/Zymo-Research/pipeline-resources/main/protocols/rnaseq.json"
+                },
+                "protocols_path": {
+                    "type": "string",
+                    "description": "Path to a JSON file listing supported library prep protocols",
+                    "hidden": true,
+                    "default": "https://raw.githubusercontent.com/Zymo-Research/pipeline-resources/main/protocols/rnaseq.json"
+                },
+                "trim_nextseq": {
+                    "type": "boolean",
+                    "description": "Whether to trim erroneous Gs at 3' end that are common on NextSeq or NovaSeq platforms",
+                    "hidden": false,
+                    "advanced": true,
+                    "default": false
+                },
+                "adapter_overlap": {
+                    "type": "integer",
+                    "description": "Overlap with adapter sequence required to trim a sequence",
+                    "hidden": true,
+                    "maximum": 5,
+                    "minimum": 1,
+                    "default": 1
+                },
+                "min_read_length": {
+                    "type": "integer",
+                    "description": "Minimum read length for a read to be kept after trimming",
+                    "hidden": true,
+                    "minimum": 15,
+                    "default": 20
+                },
+                "save_trimmed": {
+                    "type": "boolean",
+                    "description": "Whether to save FASTQ files post-trimming",
+                    "hidden": true,
+                    "default": false
+                },
+                "skip_trimming": {
+                    "type": "boolean",
+                    "description": "Whether to skip trimming step completely",
+                    "hidden": true,
+                    "default": false
+                }
+            },
+            "required": ["protocol"]
+        },
+        "alignment_options": {
+            "title": "Alignment options",
+            "type": "object",
+            "description": "Options to adjust parameters and filtering criteria for read alignments",
+            "properties": {
+                "save_unaligned": {
+                    "type": "boolean",
+                    "description": "Whether to save unaligned reads",
+                    "hidden": true,
+                    "default": false
+                },
+                "save_secondary_alignments": {
+                    "type": "boolean",
+                    "description": "Whether to save secondary alignments. By default, only primary alignments are saved",
+                    "hidden": true,
+                    "default": false
+                },
+                "star_min_overlap": {
+                    "type": "integer",
+                    "description": "Minimum overlap between R1 and R2 for merging R1 and R2 in STAR",
+                    "hidden": true,
+                    "minimum": 3,
+                    "default": 10
+                },
+                "star_max_overlap_mismatch": {
+                    "type": "number",
+                    "description": "Maximum mismatch ratio in the overlap region for merging overlapping paired-end reads in STAR",
+                    "hidden": true,
+                    "minimum": 0.01,
+                    "maximum": 0.5,
+                    "default": 0.01
+                },
+                "star_twopass": {
+                    "type": "boolean",
+                    "description": "Whether to use two-pass mode in STAR",
+                    "hidden": true,
+                    "default": false
+                },
+                "percent_mapped_cutoff": {
+                    "type": "integer",
+                    "description": "The minimum percentage of reads mapped required for a sample to proceed past alignment",
+                    "hidden": false,
+                    "advanced": true,
+                    "minimum": 0,
+                    "maximum": 100,
+                    "default": 5
+                }
+            }
+        },
+        "read_counting_options": {
+            "title": "Read counting options",
+            "type": "object",
+            "description": "Options to adjust parameters to assign reads to genes",
+            "properties": {
+                "fc_extra_attributes": {
+                    "type": "string",
+                    "description": "Define which extra attributes should also be included in featureCounts output",
+                    "hidden": true,
+                    "default": "gene_name"
+                },
+                "fc_group_features": {
+                    "type": "string",
+                    "description": "Define the attribute used to group features",
+                    "hidden": true,
+                    "default": "gene_id"
+                },
+                "fc_count_type": {
+                    "type": "string",
+                    "description": "Define the feature used to assign reads",
+                    "hidden": true,
+                    "default": "exon"
+                },
+                "fc_biotype_count_type": {
+                    "type": "string",
+                    "description": "Define the feature used to assign reads in the biotype analysis",
+                    "hidden": true,
+                    "default": "exon"
+                },
+                "fc_biotype_group_features": {
+                    "type": "string",
+                    "description": "Define the attribute used to group features in the biotype analysis",
+                    "hidden": true,
+                    "default": "gene_biotype"
+                },
+                "skip_biotype_qc": {
+                    "type": "boolean",
+                    "description": "Whether to skip biotype analysis",
+                    "hidden": true,
+                    "default": false
+                },
+                "gene_detection_method": {
+                    "type": "string",
+                    "description": "Define which method is used to calculate numbers of genes detected",
+                    "enum": ["reads", "fpkm", "tpm"],
+                    "hidden": true,
+                    "default": "reads"
+                }
+            }
+        },
+        "process_skipping_options": {
+            "title": "Process skipping options",
+            "type": "object",
+            "description": "Options to skip various quality control steps in the workflow",
+            "properties": {
+                "skip_qc": {
+                    "type": "boolean",
+                    "description": "Skip all QC steps except MultiQC",
+                    "hidden": true,
+                    "default": false
+                },
+                "skip_fastqc": {
+                    "type": "boolean",
+                    "description": "Skip FastQC",
+                    "hidden": true,
+                    "default": false
+                },
+                "skip_rseqc": {
+                    "type": "boolean",
+                    "description": "Skip RSeQC",
+                    "hidden": true,
+                    "default": false
+                },
+                "skip_qualimap": {
+                    "type": "boolean",
+                    "description": "Skip Qualimap",
+                    "hidden": true,
+                    "default": false
+                },
+                "skip_preseq": {
+                    "type": "boolean",
+                    "description": "Skip Preseq",
+                    "hidden": true,
+                    "default": false
+                },
+                "skip_markduplicates": {
+                    "type": "boolean",
+                    "description": "Skip Picard MarkDuplicates (and also dupRadar)",
+                    "hidden": true,
+                    "default": false
+                },
+                "skip_dupradar": {
+                    "type": "boolean",
+                    "description": "Skip dupRadar",
+                    "hidden": true,
+                    "default": false
+                },
+                "skip_multiqc": {
+                    "type": "boolean",
+                    "description": "Skip MultiQC",
+                    "hidden": true,
+                    "default": false
+                }
+            }
+        },
+        "comparison_options": {
+            "title": "Comparison options",
+            "type": "object",
+            "description": "Options to adjust parameters used in group comparisons",
+            "properties": {
+                "skip_deseq2": {
+                    "type": "boolean",
+                    "description": "skip DESeq2 and all group comparison analysis and plots",
+                    "hidden": true,
+                    "default": false
+                },
+                "deseq2_fdr": {
+                    "type": "number",
+                    "description": "FDR cutoff for differential gene expression analysis in DESeq2",
+                    "hidden": false,
+                    "advanced": true,
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.05
+                },
+                "deseq2_lfc": {
+                    "type": "number",
+                    "description": "Log2FoldChange cutoff for DESeq2, please use log2 of desired fold change cutoff",
+                    "hidden": false,
+                    "advanced": true,
+                    "minimum": 0,
+                    "maximum": 2,
+                    "default": 0
+                },
+                "comparisons": {
+                    "type": "string",
+                    "description": "Path to a CSV file stating the sample groups you want to compare. If not provided, all pairwise comparisons will be carried out",
+                    "hidden": true
+                },
+                "gprofiler_fdr": {
+                    "type": "number",
+                    "description": "FDR cutoff for pathway enrichment analysis in gProfiler",
+                    "hidden": false,
+                    "advanced": true,
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.05
+                }
+            }
+        },
+        "max_job_request_options": {
+            "title": "Max job request options",
+            "type": "object",
+            "description": "Set the top limit for requested resources for any single job",
+            "properties": {
+                "max_cpus": {
+                    "type": "integer",
+                    "description": "Maximum number of CPUs that can be requested for any single job",
+                    "hidden": true,
+                    "minimum": 1,
+                    "default": 8
+                },
+                "max_memory": {
+                    "type": "string",
+                    "description": "Maximum amount of memory that can be requested for any single job",
+                    "hidden": true,
+                    "default": "60.GB"
+                },
+                "max_time": {
+                    "type": "string",
+                    "description": "Maximum amount of time that can be requested for any single job",
+                    "hidden": true,
+                    "default": "48.h"
+                }
+            }
+        },
+        "generic_options": {
+            "title": "Generic options",
+            "type": "object",
+            "description": "Less common options for the pipeline, typically set in a config file",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Name for the pipeline run. If not specified, Nextflow will automatically generate a random mnemonic",
+                    "hidden": true
+                },
+                "help": {
+                    "type": "boolean",
+                    "description": "Whether to display the help message",
+                    "hidden": true,
+                    "default": false
+                },
+                "multiqc_config": {
+                    "type": "string",
+                    "description": "Path to a MultiQC config file for RNAseq workflow",
+                    "hidden": true,
+                    "default": "$baseDir/assets/multiqc_config.yaml"
+                },
+                "multiqc_config_3mrna": {
+                    "type": "string",
+                    "description": "Path to a MultiQC config file for 3'mRNAseq workflow",
+                    "hidden": true,
+                    "default": "$baseDir/assets/multiqc_3mrna_config.yaml"
+                },
+                "tracedir": {
+                    "type": "string",
+                    "description": "Path to save trace file",
+                    "hidden": true,
+                    "default": "${params.outdir}/pipeline_info"
+                },
+                "awsqueue": {
+                    "type": "string",
+                    "description": "AWS Batch queue to submit jobs to",
+                    "hidden": true
+                },
+                "awsregion": {
+                    "type": "string",
+                    "description": "AWS region",
+                    "hidden": true,
+                    "default": "us-east-1"
+                }
             }
         }
-    }
+    },
+    "allOf": [
+        {
+            "$ref": "#/definitions/input_output_options"
+        },
+        {
+            "$ref": "#/definitions/reference_genome_options"
+        },
+        {
+            "$ref": "#/definitions/read_trimming_options"
+        },
+        {
+            "$ref": "#/definitions/alignment_options"
+        },
+        {
+            "$ref": "#/definitions/read_counting_options"
+        },
+        {
+            "$ref": "#/definitions/process_skipping_options"
+        },
+        {
+            "$ref": "#/definitions/comparison_optionss"
+        },
+        {
+            "$ref": "#/definitions/max_job_request_options"
+        },
+        {
+            "$ref": "#/definitions/generic_options"
+        }
+    ]
 }

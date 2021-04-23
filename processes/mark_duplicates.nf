@@ -2,7 +2,6 @@
 params.publish_dir = "MarkDuplicates"
 params.skip_qc = false
 params.skip_markduplicates = false
-params.markdup_java_options = '"-Xms4000m -Xmx7g"'
 params.csi_index = false
 
 process mark_duplicates {
@@ -27,7 +26,7 @@ process mark_duplicates {
     path "v_markduplicates.txt", emit: version
 
     script:
-    markdup_java_options = (task.memory.toGiga() > 8) ? ${params.markdup_java_options} : "\"-Xms" +  (task.memory.toGiga() / 2 )+"g "+ "-Xmx" + (task.memory.toGiga() - 1)+ "g\""
+    markdup_java_options = (task.memory.toGiga() > 8) ? '"-Xms4000m -Xmx7g"' : "\"-Xms" +  (task.memory.toGiga() / 2 )+"g "+ "-Xmx" + (task.memory.toGiga() - 1)+ "g\""
     dupsam_index = params.csi_index ? "samtools index -c ${meta.name}.markDups.bam" : "samtools index ${meta.name}.markDups.bam"
     """
     picard ${markdup_java_options} MarkDuplicates \\

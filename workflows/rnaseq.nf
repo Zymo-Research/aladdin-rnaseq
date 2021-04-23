@@ -32,12 +32,16 @@ if (params.ercc_spikein) {
 }
 
 // Parse protocol
-params.protocol_settings = parse_protocol(params.protocol, params.protocols_path)
-params.summary['Trimming'] = params.protocol_settings['trimming_text']
-params.summary['Strandedness'] = params.protocol_settings['strandedness_text']
-params.summary['Library Prep'] = params.protocol_settings['common_name']
-// Ensure correct reads and input channels are set up for zymo-seq 3' mRNA data processing without using UMI to dedup
-params.ignore_R1 = (params.protocol == "zymo_3mrna_nodedup")
+if (params.protocol) {
+    params.protocol_settings = parse_protocol(params.protocol, params.protocols_path)
+    params.summary['Trimming'] = params.protocol_settings['trimming_text']
+    params.summary['Strandedness'] = params.protocol_settings['strandedness_text']
+    params.summary['Library Prep'] = params.protocol_settings['common_name']
+    // Ensure correct reads and input channels are set up for zymo-seq 3' mRNA data processing without using UMI to dedup
+    params.ignore_R1 = (params.protocol == "zymo_3mrna_nodedup")
+} else {
+    exit 1, "--protocol is a required input!"
+}
 
 /*
  * SET & VALIDATE INPUT CHANNELS
@@ -120,14 +124,12 @@ include { rseqc } from '../processes/rseqc' addParams(
 include { preseq } from '../processes/preseq' addParams(
     publish_dir: "${params.outdir}/preseq",
     skip_qc: params.skip_qc,
-    skip_preseq: params.skip_preseq,
-    preseq_defect_filesize: params.preseq_defect_filesize
+    skip_preseq: params.skip_preseq
 )
 include { mark_duplicates } from '../processes/mark_duplicates' addParams(
     publish_dir: "${params.outdir}/MarkDuplicates",
     skip_qc: params.skip_qc,
     skip_markduplicates: params.skip_markduplicates,
-    markdup_java_options: params.markdup_java_options,
     csi_index: params.genome_settings.csi_index
 )
 include { dupradar } from '../processes/dupradar' addParams(

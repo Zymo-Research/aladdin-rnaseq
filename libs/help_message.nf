@@ -34,7 +34,7 @@ def help_message() {
       --skip_trimming               Skips trimming step and use the reads directly for alignment
 
     Alignment:
-      --save_unaligned              Save unaligned reads from either STAR or HISAT2 to extra output files.
+      --save_unaligned              Save unaligned reads from STAR to extra output files.
       --save_secondary_alignments   Save secondary alignments. By default only primary alignment were saved, resulting in only one alignment per read in BAM files.
       --star_min_overlap [int]      Minimum overlap bases for merging overlapping paired-end reads in STAR (default: 10)
       --star_max_overlap_mismatch   Maximum mismatch ratio in the overlap region for merging overlapping paired-end reads in STAR (default: 0.01)
