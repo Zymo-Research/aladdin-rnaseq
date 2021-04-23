@@ -36,7 +36,7 @@ if (params.protocol) {
     params.protocol_settings = parse_protocol(params.protocol, params.protocols_path)
     params.summary['Trimming'] = params.protocol_settings['trimming_text']
     params.summary['Strandedness'] = params.protocol_settings['strandedness_text']
-    params.summary['Library Prep'] = params.protocol_settings['common_name']
+    params.summary['Library Prep'] = params.protocol_settings['description']
     // Ensure correct reads and input channels are set up for zymo-seq 3' mRNA data processing without using UMI to dedup
     params.ignore_R1 = (params.protocol == "zymo_3mrna_nodedup")
 } else {
