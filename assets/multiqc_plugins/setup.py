@@ -25,8 +25,7 @@ setup(
             'plot_sample_distance = multiqc_zymo.modules.plot_sample_distance:MultiqcModule',
             'plot_gene_heatmap = multiqc_zymo.modules.plot_gene_heatmap:MultiqcModule',
             'DESeq2 = multiqc_zymo.modules.DESeq2:MultiqcModule',
-            'gProfiler = multiqc_zymo.modules.gProfiler:MultiqcModule',
-            'download_data = multiqc_zymo.modules.download_data:MultiqcModule'
+            'gProfiler = multiqc_zymo.modules.gProfiler:MultiqcModule'
         ],
         'multiqc.hooks.v1': [
             'before_config = multiqc_zymo.custom_code:plugin_before_config',

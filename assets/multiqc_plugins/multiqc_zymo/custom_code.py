@@ -52,9 +52,6 @@ def plugin_execution_start():
         config.update_dict( config.sp, { 'DESeq2' : { 'fn' : '*DESeq_results*' } } )
     if 'gProfiler' not in config.sp:
         config.update_dict( config.sp, { 'gProfiler' : { 'fn' : '*gProfiler_results*' } } )
-    if 'download_data' not in config.sp:
-        config.update_dict( config.sp, { 'download_data' : { 'fn' : '*download_links*.json', 'shared': True } } )
-
     
     # Some additional filename cleaning
     config.fn_clean_exts.extend([
