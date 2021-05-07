@@ -14,8 +14,6 @@ dependencies:
   - r-pheatmap=1.0.12=r40h6115d3f_2
   - pandas=1.1.5=py37hdc94413_0
   - matplotlib=3.3.2=0
-  - scipy=1.5.3=py37h8911b10_0
-  - boto3=1.16.34=py_0
   - openpyxl=3.0.5=py_0 # Needed for exporting to EXCEL in python
   - xorg-libxaw=1.0.13=h516909a_1002 # Needed for jpeg function in R
 
@@ -31,7 +29,6 @@ dependencies:
   - picard=2.23.9=0
   - bioconductor-dupradar=1.18.0=r40_1
   - subread=2.0.1=hed695b0_0
-  - stringtie=2.1.4=h7e0af3c_0
   - bioconductor-limma=3.44.1=r40h037d062_0
   - bioconductor-deseq2=1.28.0=r40h5f743cb_0
   - gprofiler-official=1.0.0=py_0

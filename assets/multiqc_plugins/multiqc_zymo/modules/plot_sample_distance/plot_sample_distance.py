@@ -78,7 +78,8 @@ class MultiqcModule(BaseMultiqcModule):
         for filename, data in self.plot_heatmap_data.items():
             pconfig = {
                     "xTitle": "Samples",
-                    "yTitle": "Samples"
+                    "yTitle": "Samples",
+                    'decimalPlaces': 4
                     }
             if "sample_distance_matrix" in filename.lower():
                 pconfig["id"] = "sample_distance_matrix"
@@ -97,15 +98,10 @@ class MultiqcModule(BaseMultiqcModule):
                                        "between samples are visualized here in the form of "
                                        "heatmap. Larger values indicate higher similarity "
                                        "between samples.")
-            if "isomirs" in filename.lower():
-                section_description += (" The similarities were calculated using Log2 values "
-                                        "of normalized read counts of all mature miRNAs using "
-                                        "[isomiRs](https://www.bioconductor.org/packages/release/bioc/html/isomiRs.html).")
-            elif "deseq" in filename.lower():
-                section_description += (" The similarities were calculated using normalized and "
-                                        "'rlog' transformed read counts of all genes using "
-                                        "[DESeq2](https://www.bioconductor.org/packages/release/bioc/html/DESeq2.html).") 
-            
+            section_description += (" The similarities were calculated using normalized and "
+                                    "['rlog'](http://www.bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#regularized-log-transformation) "
+                                    "transformed read counts of all genes.") 
+        
             heatmap_plot_html = heatmap.plot(data.values.tolist(), data.columns.tolist(), data.index.tolist(), pconfig)
             # Add a report section
             self.add_section(
@@ -138,10 +134,9 @@ class MultiqcModule(BaseMultiqcModule):
                 section_anchor = "sample_MDS_plot"
                 section_description = ("[Multidimensional scaling](https://en.wikipedia.org/wiki/Multidimensional_scaling) "
                     "was conducted to visualize the distance/similarity between samples.")
-            if "isomirs" in filename.lower():
-                section_description += " Top 500 miRNAs with highest variance among samples were used to make this plot."
-            elif "deseq" in filename.lower():
-                section_description += " Top 500 genes with highest variance among samples were used to make this plot."
+            section_description += (" This plot was made using normalized and "
+                                    "['rlog'](http://www.bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#regularized-log-transformation) "
+                                    "transformed read counts of top 500 genes with highest variance among samples.")
             scatter_plot_html = scatter.plot(data["data"], pconfig)
             self.add_section(
                     name = section_name,

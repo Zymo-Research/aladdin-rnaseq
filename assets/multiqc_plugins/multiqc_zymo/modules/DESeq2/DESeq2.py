@@ -94,16 +94,16 @@ class MultiqcModule(BaseMultiqcModule):
         # Set table headers
         headers = OrderedDict()
         headers["up_deg"] = {
-                "title": "Higher in condition 1",
-                "description": "Numbers of differentially expressed genes with higher expression in condition 1"
+                "title": "Higher in group 1",
+                "description": "Numbers of differentially expressed genes with higher expression in group 1"
                 }
         headers["down_deg"] = {
-                "title": "Higher in condition 2",
-                "description": "Numbers of differentially expressed genes with higher expression in condition 2"
+                "title": "Higher in group 2",
+                "description": "Numbers of differentially expressed genes with higher expression in group 2"
                 }
         headers["not_deg"] = {
                 "title": "Not differentially expressed",
-                "description": "Numbers of genes that were not differentially expressed between conditions 1 and 2"
+                "description": "Numbers of genes that were not differentially expressed between groups 1 and 2"
                 }
         headers["filtered"] = {
                 "title": "Did not pass filter",
@@ -111,7 +111,7 @@ class MultiqcModule(BaseMultiqcModule):
                 }
         table_config = {
                 "id": "Differential_Expression_Table",
-                "col1_header": "Comparison(cond.1_cond.2)",
+                "col1_header": "Comparison(group1_vs_group2)",
                 "format": "{:,.0f}", # No decimal
                 "sortRows": False
                 }
@@ -154,8 +154,8 @@ class MultiqcModule(BaseMultiqcModule):
         # Set the figure config
         pconfig = {
                 "id": "Scatter_plot",
-                "xlab": "Normalized mean counts in {}".format(cond1),
-                "ylab": "Nomarlized mean counts in {}".format(cond2),
+                "xlab": "Mean transformed counts in {}".format(cond1),
+                "ylab": "Mean transformed counts in {}".format(cond2),
                 "xLog": True,
                 "yLog": True,
                 "colors": { "DEG":"#f45b5b", "nonDEG":"#434348" },
@@ -170,12 +170,12 @@ class MultiqcModule(BaseMultiqcModule):
                 anchor = "scatter_plot",
                 description = ("Scatter plot is a simple and straightforward way"
                 " to visualize differential gene expression results."
-                " Expression levels of genes in one condition are shown on X-axis"
-                " while those in other are shown on Y-axis.<br>"
+                " Mean transformed read counts of genes in one group are shown on X-axis"
+                " while those in the other are shown on Y-axis.<br>"
                 "The scatter plots here include differentially expressed genes"
                 " (up to the first 1000 genes) and up to 1000 randomly selected"
                 " non-differentially expressed genes. You can download the"
-                " scatter plots with all genes in the [Download data section](#download_data).<br>"
+                " scatter plots with all genes on the results page on Aladdin platform.<br>"
                 "Red dots represent differentially expressed genes (adjusted p-values<{}). "
                 "Grey dots represent non-differentially expressed genes. "
                 "Count data transformation was carried out using the 'rlog' method in DESeq2").format(alpha),
@@ -211,7 +211,7 @@ class MultiqcModule(BaseMultiqcModule):
         pconfig = {
                 "id": "MA_plot",
                 "xlab": "Normalized mean read counts",
-                "ylab": "Log2(Fold Change)",
+                "ylab": "Log2(Fold Change) after shrinkage",
                 "xLog": True,
                 "colors": { "DEG":"#f45b5b", "nonDEG":"#434348" },
                 "marker_line_colour": { "DEG":"#f45b5b", "nonDEG":"#434348" },
@@ -230,10 +230,10 @@ class MultiqcModule(BaseMultiqcModule):
                 "The MA plots here include differentially expressed genes (up to"
                 " the first 1000 genes) and up to 1000 randomly selected non-differentially"
                 " expressed genes. You can download the MA plots with all genes"
-                " in the [Download data section](#download_data).<br>"
+                " on the results page on Aladdin platform.<br>"
                 "Red dots represent differentially expressed genes (adjusted p-values<{}). "
                 "Grey dots represent non-differentially expressed genes. "
-                "Shrinkage of effect size was carried out using the 'normal' method in DESeq2").format(alpha),
+                "Shrinkage of effect size was carried out using the 'ashr' method in DESeq2").format(alpha),
                 plot = scatter_plot_html
                 )
         
@@ -245,7 +245,7 @@ class MultiqcModule(BaseMultiqcModule):
                 }
         headers["baseMean"] = {
                 "title": "Mean counts",
-                "description": "Mean read counts in both conditions",
+                "description": "Mean read counts in both groups",
                 "format": "{:,.0f}"
                 }
         headers["log2FoldChange"] = {

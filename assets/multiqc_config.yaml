@@ -1,6 +1,6 @@
 # Title and introductory text.
-intro_text: This report includes summaries of data quality, data processing, and snapshots of results for your RNAseq study. This report should assist you to get a general picture of the study, to spot any irregularities in the sample or data, and to explore the most significant results in differential gene expression. Please consult <a href='https://github.com/Zymo-Research/service-pipeline-documentation/blob/master/docs/how_to_use_RNAseq_report.md' target='_blank'>our RNAseq report documentation</a> on how to use this report.
-report_comment: If you have any question regarding this report, please contact the Zymo representative who sent you this report.
+intro_text: This report includes summaries of data quality, data processing, and snapshots of results for your RNAseq study. Please consult <a href='https://zymo-research.github.io/aladdin-rnaseq/docs/report_documentation.html' target='_blank'>our RNAseq report documentation</a> on how to use this report.
+report_comment: If you have any question regarding this report, please contact us via the Aladdin platform.
 
 extra_fn_clean_exts:
     - _R1

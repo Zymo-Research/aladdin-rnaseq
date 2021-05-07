@@ -60,31 +60,18 @@ class MultiqcModule(BaseMultiqcModule):
         # Create heatmap
         for filename, data in self.plot_heatmap_data.items():
             pconfig = {
-                    "xTitle": "Samples",
-                    "square": False
-                    }
-            if "isomirs" in filename.lower():
-                pconfig["id"] = "miRNA_heatmap"
-                pconfig["title"] = "Expression patterns of top miRNAs"
-                pconfig["yTitle"] = "miRNAs"
-                description = ("Normalized read counts of top miRNAs with highest variance, "
-                               "calculated using [isomiRs](https://www.bioconductor.org/packages/release/bioc/html/isomiRs.html). "
-                               "Values plotted in Log2 scale after centering per miRNA. "
-                               "A static version of this figure can be "
-                               " download in the [Download data section](#download_data).")
-            elif "deseq2" in filename.lower():
-                pconfig["id"] = "gene_heatmap"
-                pconfig["title"] = "Expression patterns of top genes"
-                pconfig["yTitle"] = "genes"
-                description = ("Normalized read counts of top genes with highest variance, "
-                               "calculated using [DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html). "
-                               "Values plotted in Log2 scale after centering per gene. "
-                               "A static version of this figure can be "
-                               "download in the [Download data section](#download_data).")
-                
+                "id": "gene_heatmap",
+                "title": "Expression patterns of top genes",
+                "xTitle": "Samples",
+                "yTitle": "Genes",
+                "square": False
+            }
             heatmap_plot_html = heatmap.plot(data.values.tolist(), data.columns.tolist(), data.index.tolist(), pconfig)
             # Add a report section
             self.add_section(
-                    description = description,
+                    description = ("Transformed read counts of top genes with highest variance, "
+                                   "calculated using [DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html). "
+                                   "Read counts transformed using 'rlog' algorithm in DESeq2 and plotted in Log2 scale after centering per gene. "
+                                   "A static version of this figure can be download on the results page on Aladdin platform."),
                     plot = heatmap_plot_html
-                    )
+            )
