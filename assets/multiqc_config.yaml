@@ -1,5 +1,5 @@
 # Title and introductory text.
-intro_text: This report includes summaries of data quality, data processing, and snapshots of results for your RNAseq study. Please consult <a href='https://zymo-research.github.io/aladdin-rnaseq/docs/report_documentation.html' target='_blank'>our RNAseq report documentation</a> on how to use this report.
+intro_text: This report includes summaries of data quality, data processing, and snapshots of results for your RNAseq study. Please consult <a href='https://zymo-research.github.io/pipeline-resources/report_docs/RNAseq_documentation.html' target='_blank'>our RNAseq report documentation</a> on how to use this report.
 report_comment: If you have any question regarding this report, please contact us via the Aladdin platform.
 
 extra_fn_clean_exts:
