@@ -1,0 +1,80 @@
+# Title and introductory text.
+intro_text: This report includes summaries of data quality, data processing, and snapshots of results for your RNAseq study. Please consult <a href='https://zymo-research.github.io/pipeline-resources/report_docs/RNAseq_documentation.html' target='_blank'>our RNAseq report documentation</a> on how to use this report.
+report_comment: This protocol assigns Unique Molecular Identifiers from Read 1 to Read 2, and uses only Read 2 for analysis. All report sections present Read 2 as R1, Read 1 or read 1. If you have any question regarding this report, please contact us via the Aladdin platform.
+
+extra_fn_clean_exts:
+    - _R1
+    - _R2
+    - '.markDups'
+    - '.rseqc'
+    - '.ccurve'
+
+# Module and section comments
+section_comments:
+    fastqc: "Only QC results of read 1 are plotted here. Please contact us for reads 2 QC plots if interested."
+
+# Order of modules
+module_order:
+    - fastqc:
+        path_filters:
+            - '*_R2_fastqc.zip'
+    - Trim_Galore
+    - star
+    - rseqc
+    - qualimap
+    - picard
+    - preseq
+    - plot_ERCC
+    - featureCounts
+    - plot_sample_distance
+    - plot_gene_heatmap
+    - DESeq2
+    - gProfiler
+
+# Order of sections
+report_section_order:
+    software_versions:
+        order: -1000
+    workflow_summary:
+        order: -1100
+    biotype-counts:
+        after: 'featurecounts'
+
+table_columns_visible:
+    FastQC:
+        percent_duplicates: False
+    Trim_Galore:
+        percent_trimmed: False
+    STAR:
+        uniquely_mapped: False
+    RSeQC:
+        proper_pairs_percent: False
+    QualiMap:
+        reads_aligned: False
+        5_3_bias: False
+
+table_columns_placement:
+    FastQC:
+        total_sequences: 900
+        percent_gc: 910
+    Trim_Galore:
+        percent_pass_filter: 920
+    STAR:
+        uniquely_mapped_percent: 930
+    UMI-tools:
+        kept_dedupped: 940
+    Biotype Counts:
+        rRNA: 950
+    featureCounts:
+        percent_assigned: 960
+        Assigned: 970
+
+remove_sections:
+    - fastqc_sequence_counts
+    - fastqc_sequence_duplication_levels
+    - fastqc_status_checks
+    - qualimap-reads-genomic-origin
+    
+#export_plots: true
+
+log_filesize_limit: 50000000

@@ -1,0 +1,35 @@
+# You can use this file to create a conda environment for this pipeline:
+# conda env create -f environment.yml
+name: rnaseq
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  ## conda-forge packages
+  - r-base=4.0.2=he766273_1
+  - r-openxlsx=4.2.2=r40h0357c0b_0
+  - r-ggplot2=3.3.2=r40h6115d3f_0
+  - r-ashr=2.2_47=r40h0357c0b_1
+  - r-pheatmap=1.0.12=r40h6115d3f_2
+  - pandas=1.1.5=py37hdc94413_0
+  - matplotlib=3.3.2=0
+  - openpyxl=3.0.5=py_0 # Needed for exporting to EXCEL in python
+  - xorg-libxaw=1.0.13=h516909a_1002 # Needed for jpeg function in R
+
+  ## bioconda packages, see above
+  - fastqc=0.11.9=0
+  - trim-galore=0.6.6=0
+  - star=2.6.1d=0 # Don't upgrade
+  - umi_tools=1.1.1
+  - samtools=1.9=h10a08f8_12
+  - rseqc=4.0.0=py37hf01694f_0
+  - qualimap=2.2.2a=1
+  - preseq=2.0.3=hc216eb9_5
+  - picard=2.23.9=0
+  - bioconductor-dupradar=1.18.0=r40_1
+  - subread=2.0.1=hed695b0_0
+  - bioconductor-limma=3.44.1=r40h037d062_0
+  - bioconductor-deseq2=1.28.0=r40h5f743cb_0
+  - gprofiler-official=1.0.0=py_0
+  - multiqc=1.9=py_1
