@@ -77,4 +77,4 @@ A sample report this pipeline produces can be found [here](https://zymo-research
 A documentation explaining how to understand the report can be found [here](https://zymo-research.github.io/pipeline-resources/report_docs/how_to_use_RNAseq_report.html).
 
 #### Materials and Methods
-A [Materials and Methods document](https://zymo-research.github.io/pipeline-resources/method_docs/RNAseq_method.docx) is available to help you write your manuscript if you used this pipeline in your research.
+A [Materials and Methods document](https://zymo-research.github.io/pipeline-resources/methods_docs/RNAseq_method.docx) is available to help you write your manuscript if you used this pipeline in your research.
