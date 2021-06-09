@@ -291,7 +291,7 @@ workflow RNASEQ3M {
     counts_locations = merge_featurecounts.out.merged_counts.map { "${params.outdir}/featureCounts/" + it.getName() }
     deseq2_locations = deseq2.out.download.flatten().map { "${params.outdir}/DESeq2/" + it.getName() }
     gprofiler_locations = gprofiler.out.download.flatten().map { "${params.outdir}/gProfiler/" + it.getName() }
-    report_locations = multiqc.out.report.map { "${params.outdir}/MultiQC/" + it.getName() }
+    report_locations = multiqc_3mrna.out.report.map { "${params.outdir}/MultiQC/" + it.getName() }
     bam_locations
         .mix(counts_locations, deseq2_locations, gprofiler_locations, report_locations)
         .collectFile(name: "${params.outdir}/download_data/file_locations.txt", newLine: true )
