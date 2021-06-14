@@ -43,9 +43,6 @@ if (params.protocol) {
     exit 1, "--protocol is a required input!"
 }
 
-// Ensure original bams are saved
-params.save_bam = true
-
 /*
  * SET & VALIDATE INPUT CHANNELS
  */
@@ -103,7 +100,7 @@ include { star } from '../processes/star' addParams(
     publish_dir: "${params.outdir}/STAR",
     save_unaligned: (params.save_unaligned || params.ercc_spikein), // Also save unaligned if ERCC alignment is requested
     save_secondary_alignments: params.save_secondary_alignments,
-    save_bam: params.save_bam,
+    save_bam: true, // Always save BAM here, as there is no markduplicates step
     csi_index: params.genome_settings.csi_index,
     bacteria: params.genome_settings.bacteria,
     star_twopass: params.star_twopass,
@@ -298,7 +295,7 @@ workflow RNASEQ3M {
         .set { locations }
     
     // Save md5sum into one file
-    star.out.bam_md5sum
+    star.out.md5sum
         .collectFile(name: "${params.outdir}/download_data/md5sum.txt", sort: { it.getName() } )
         .set { md5sums }
     
