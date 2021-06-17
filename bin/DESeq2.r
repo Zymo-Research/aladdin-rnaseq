@@ -35,12 +35,14 @@ countdata <- read.csv(merged_counts, header=TRUE, row.names=1, sep="\t", check.n
 gene_name <- data.frame(countdata$gene_name, row.names = row.names(countdata), check.names=FALSE, stringsAsFactors=FALSE)
 # Read the sample grouping
 grouping <- read.csv(design_csv, header=TRUE, check.names=FALSE, stringsAsFactors=FALSE)
-# If group label absent, use sample label
-grouping$group <- ifelse(is.na(grouping$group), grouping$sample, grouping$group)
 # Only use samples that appear in both design CSV and merged counts
 shared_snames <- intersect(grouping$sample, names(countdata))
 grouping <- grouping[grouping$sample %in% shared_snames,]
 countdata <- as.matrix(countdata[,grouping$sample])
+# If only one group label present, set it to NA to avoid DESeq2 error
+if (length(unique(grouping$group)) < 2) { grouping$group <- NA }
+# If group label absent, use sample label
+grouping$group <- ifelse(is.na(grouping$group), grouping$sample, grouping$group)
 # Filter groups so that all groups have at least 2 replicates
 no.replicates <- table(grouping$group)
 groups <- names(no.replicates)[no.replicates > 1]
