@@ -38,7 +38,7 @@ grouping <- read.csv(design_csv, header=TRUE, check.names=FALSE, stringsAsFactor
 # Only use samples that appear in both design CSV and merged counts
 shared_snames <- intersect(grouping$sample, names(countdata))
 grouping <- grouping[grouping$sample %in% shared_snames,]
-countdata <- as.matrix(countdata[,grouping$sample])
+countdata <- as.matrix(countdata[,grouping$sample, drop=FALSE])
 # If only one group label present, set it to NA to avoid DESeq2 error
 if (length(unique(grouping$group)) < 2) { grouping$group <- NA }
 # If group label absent, use sample label
@@ -51,7 +51,12 @@ groups <- names(no.replicates)[no.replicates > 1]
 # Create coldata
 coldata <- data.frame(row.names=grouping$sample, group=grouping$group)
 # Load DESeq object
-dds <- DESeqDataSetFromMatrix(countData=countdata, colData=coldata, design=~group)
+if (ncol(countdata) > 1) {
+    dds <- DESeqDataSetFromMatrix(countData=countdata, colData=coldata, design=~group)
+} else {
+    # When there is only one sample, design has to be ~1
+    dds <- DESeqDataSetFromMatrix(countData=countdata, colData=coldata, design=~1)
+}
 # Drop rows with all zeroes
 dds <- dds[rowSums(counts(dds)) > 0, ]
 dds <- estimateSizeFactors(dds)
