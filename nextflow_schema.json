@@ -4,6 +4,8 @@
     "title": "Zymo-Research/aladdin-rnaseq pipeline parameters",
     "description": "Nextflow RNA-Seq analysis pipeline, part of the Zymo Research bioinformatics pipeline catalog",
     "type": "object",
+    "custom_request": true,
+    "custom_request_instruction": "Please provide as much detail as possible for your request. For example, a request for a reference genome should include links to the genome and its annotations; a request for a different protocol should include link to the library prep kit.",
     "definitions": {
         "input_output_options": {
             "title": "Input/output options",
@@ -36,9 +38,10 @@
             "properties": {
                 "genome": {
                     "type": "string",
-                    "description": "Reference genome used to align reads",
+                    "description": "Reference genome used to align reads. If your genome is not listed, please use Custom Request box to request help.",
                     "hidden": false,
                     "advanced": false,
+                    "custom_request": true,
                     "choices_json": "https://raw.githubusercontent.com/Zymo-Research/pipeline-resources/main/genomes/rnaseq_aladdin.json"
                 },
                 "genomes_path": {
@@ -71,9 +74,10 @@
             "properties": {
                 "protocol": {
                     "type": "string",
-                    "description": "Library prep protocol/kit used",
+                    "description": "Library prep protocol/kit used. If your kit is not listed, please use Custom Request box to request help.",
                     "hidden": false,
                     "advanced": false,
+                    "custom_request": true,
                     "choices_json": "https://raw.githubusercontent.com/Zymo-Research/pipeline-resources/main/protocols/rnaseq.json"
                 },
                 "protocols_path": {
