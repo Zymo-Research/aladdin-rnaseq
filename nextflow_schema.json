@@ -39,7 +39,7 @@
                     "description": "Reference genome used to align reads",
                     "hidden": false,
                     "advanced": false,
-                    "choices_json": "https://raw.githubusercontent.com/Zymo-Research/pipeline-resources/main/genomes/rnaseq.json"
+                    "choices_json": "https://raw.githubusercontent.com/Zymo-Research/pipeline-resources/main/genomes/rnaseq_aladdin.json"
                 },
                 "genomes_path": {
                     "type": "string",
