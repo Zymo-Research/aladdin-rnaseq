@@ -34,16 +34,22 @@ log.info "Zymo rnaseq v${workflow.manifest.version}"
 def summary = collect_summary(params, workflow)
 log.info summary.collect { k,v -> "${k.padRight(21)}: $v" }.join("\n")
 
+// Import appropriate workflow 
+if (params.merged_counts) { // when merged_counts is supplied, it is assumed that only comparison is requested using merged_counts
+    include { COMPARISON } from './workflows/comparison' addParams( summary: summary, outdir: outdir )
+} else if (params.protocol == "zymo_3mrna") {
+    include { RNASEQ3M } from './workflows/3mrnaseq' addParams( summary: summary, outdir: outdir )
+} else {
+    include { RNASEQ } from './workflows/rnaseq' addParams( summary: summary, outdir: outdir )
+}
+
 // Workflow 
 workflow {
     if (params.merged_counts) { // when merged_counts is supplied, it is assumed that only comparison is requested using merged_counts
-        include { COMPARISON } from './workflows/comparison' addParams( summary: summary, outdir: outdir )
         COMPARISON()
     } else if (params.protocol == "zymo_3mrna") {
-        include { RNASEQ3M } from './workflows/3mrnaseq' addParams( summary: summary, outdir: outdir )
         RNASEQ3M()
     } else {
-        include { RNASEQ } from './workflows/rnaseq' addParams( summary: summary, outdir: outdir )
         RNASEQ()
     }
 }
