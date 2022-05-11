@@ -85,11 +85,11 @@ if (length(grouping$sample) > 2) {
     # Similarity matrix as heatmap
     correlation_matrix <- data.frame(cor(assay(transformed), method="pearson"))
     jpeg("DESeq2_sample_similarity_matrix.jpg", width=8, height=8, unit="in", res=300)
-    pheatmap(correlation_matrix, annotation_col=coldata)
+    p <- pheatmap(correlation_matrix, annotation_col=coldata, clustering_distance_cols="correlation", clustering_distance_rows="correlation")
     dev.off()
     # Also output the matrix to plot in MultiQC
     sample_order <- hclust(as.dist(1-correlation_matrix))$order
-    correlation_matrix <- correlation_matrix[sample_order, sample_order]
+    correlation_matrix <- correlation_matrix[p$tree_row$label[p$tree_row$order], p$tree_col$label[p$tree_col$order]]
     write.table(correlation_matrix, "DESeq2_sample_similarity_matrix.tsv", sep="\t", quote=FALSE)
     # Make a heatmap for top 100 genes with most variance
     topVarGenes <- head(order(rowVars(assay(transformed)), decreasing=TRUE), 100)

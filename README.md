@@ -9,7 +9,7 @@ This is a bioinformatics analysis pipeline used for bulk RNA sequencing data dev
 * Improved biotype QC analysis and rRNA reads detection
 * Added ability to handle ERCC spike-ins
 * Added several MultiQC plugins to visualize QC/analysis results
-* Compatibility to run on [Aladdin Open Bioinformatics](http://www.aladdin101.com)
+* Compatibility to run on [Aladdin Bioinformatics Platform](http://www.aladdin101.org)
 
 This pipeline is built using [Nextflow](https://www.nextflow.io), a bioinformatics workflow tool to run tasks across multiple compute infrastructures in a very portable manner. It comes with docker containers making installation trivial and results highly reproducible.
 
