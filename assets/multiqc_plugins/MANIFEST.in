@@ -1,1 +1,1 @@
-recursive-include multiqc_zymo *
+recursive-include multiqc_aladdin_rnaseq *

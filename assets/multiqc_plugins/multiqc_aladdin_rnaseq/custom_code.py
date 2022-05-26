@@ -14,13 +14,13 @@ from multiqc.utils import report, util_functions, config
 log = logging.getLogger('multiqc')
 
 # Save this plugin's version number (defined in setup.py) to the MultiQC config
-config.multiqc_zymo_version = get_distribution("multiqc_zymo").version
+config.multiqc_aladdin_rnaseq_version = get_distribution("multiqc_aladdin_rnaseq").version
 
 # Add default config options that can be overriden by user config
 def plugin_before_config():
     
-    # Use the zymo template by default
-    config.template = 'zymo'
+    # Use the aladdin template by default
+    config.template = 'aladdin'
     
 # Add additional config options
 def plugin_execution_start():
@@ -35,7 +35,7 @@ def plugin_execution_start():
     if config.kwargs.get('disable_plugin', False) is True:
         return None
 
-    log.info("Running rnaseq MultiQC Plugins v{}".format(config.multiqc_zymo_version))
+    log.info("Running rnaseq MultiQC Plugins v{}".format(config.multiqc_aladdin_rnaseq_version))
 
     # Add to the search patterns used by modules
     if 'Trim_Galore' not in config.sp:
@@ -55,8 +55,6 @@ def plugin_execution_start():
     
     # Some additional filename cleaning
     config.fn_clean_exts.extend([
-        '_R1',
-        '_R2',
         '_plot_ERCC',
         '_DESeq_results',
         '_gProfiler_results'

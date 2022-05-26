@@ -3,8 +3,16 @@ intro_text: This report includes summaries of data quality, data processing, and
 report_comment: If you have any question regarding this report, please contact us via the Aladdin platform.
 
 extra_fn_clean_exts:
-    - _R1
-    - _R2
+    - type: "truncate"
+      pattern: "_R1"
+      module:
+          - fastqc
+          - Trim_Galore
+    - type: "truncate"
+      pattern: "_R2"
+      module:
+          - fastqc
+          - Trim_Galore
     - '.markDups'
     - '.rseqc'
     - '.ccurve'
