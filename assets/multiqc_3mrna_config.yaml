@@ -7,12 +7,12 @@ extra_fn_clean_exts:
       pattern: "_R1"
       module:
           - fastqc
-          - Trim_Galore
+          - trim_galore
     - type: "truncate"
       pattern: "_R2"
       module:
           - fastqc
-          - Trim_Galore
+          - trim_galore
     - '.markDups'
     - '.rseqc'
     - '.ccurve'
