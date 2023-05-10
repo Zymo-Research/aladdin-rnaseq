@@ -128,6 +128,7 @@ class MultiqcModule(BaseMultiqcModule):
         
         # Create scatter plots
         xy_plot_data = OrderedDict()
+        xy_plot_config = OrderedDict()
         for sample_name, data in self.deseq_results.items():
             cond1, cond2 = sample_name.split("_vs_")
             cols = [cond1, cond2, gene_label]
@@ -151,18 +152,23 @@ class MultiqcModule(BaseMultiqcModule):
             plot_data["DEG"] = deg.to_dict("records")
             plot_data["nonDEG"] = non_deg.to_dict("records")
             xy_plot_data[sample_name] = plot_data
+            xy_plot_config[sample_name] = {
+                "name": sample_name,
+                "xlab": "Mean normalized counts in {}".format(cond1),
+                "ylab": "Mean nomarlized counts in {}".format(cond2)
+            }
         # Set the figure config
         pconfig = {
                 "id": "Scatter_plot",
-                "xlab": "Mean transformed counts in {}".format(cond1),
-                "ylab": "Mean transformed counts in {}".format(cond2),
+                "xlab": list(xy_plot_config.values())[0]["xlab"],
+                "ylab": list(xy_plot_config.values())[0]["ylab"],
                 "xLog": True,
                 "yLog": True,
                 "colors": { "DEG":"#f45b5b", "nonDEG":"#434348" },
                 "marker_line_colour": { "DEG":"#f45b5b", "nonDEG":"#434348" },
                 "square": True,
                 "marker_size": 3,
-                "data_labels": [{"name": sample} for sample in xy_plot_data.keys()]
+                "data_labels": list(xy_plot_config.values())
                 }
         scatter_plot_html = scatter.plot(list(xy_plot_data.values()), pconfig)
         self.add_section(
@@ -217,7 +223,7 @@ class MultiqcModule(BaseMultiqcModule):
                 "marker_line_colour": { "DEG":"#f45b5b", "nonDEG":"#434348" },
                 "square": True,
                 "marker_size": 3,
-                "data_labels": [{"name": sample} for sample in ma_plot_data.keys()]
+                "data_labels": [{"name":sample, "xlab":"Mean normalized read counts", "ylab":"Log2(Fold Change)"} for sample in ma_plot_data.keys()]
                 }
         scatter_plot_html = scatter.plot(list(ma_plot_data.values()), pconfig)
         self.add_section(
