@@ -8,6 +8,9 @@ def check_design(DesignFileIn, DesignFileOut, Comparison, IgnoreR1):
 
     HEADER = ['group','sample','read_1','read_2']
     legal_pattern = r"^[a-zA-Z][a-zA-Z0-9_]*$"
+    illegal_patterns = ["_tophat", "ReadsPerGene", "_star_aligned", "_fastqc", "_counts", "Aligned", "_slamdunk", "_bismark", "_SummaryStatistics", \
+                        "_duprate", "_vep", "ccs", "_NanoStats", "_R1", "_R2", "_trimmed", "_val", "_mqc", "short_summary_", "_summary", "_matrix", \
+                        r"_$", r"^R1", r"^R2", "_plot_ERCC", "_DESeq_results", "_gProfiler_results", "_trimmed_first"]
     
     with open(DesignFileIn, "r") as fin:
         # Check the header first
@@ -23,6 +26,8 @@ def check_design(DesignFileIn, DesignFileOut, Comparison, IgnoreR1):
             assert len(cols) == len(HEADER), "Number of columns incorrect in line '{}'!".format(line.strip())
             # Check the sample label
             assert re.match(legal_pattern, cols[1]), "Sample label {} contains illegal characters or does not start with letters!".format(cols[1])
+            for phrase in illegal_patterns:
+                assert re.search(phrase, cols[1])==None, "Sample label {} contains file phrase(s) that will be automatically filtered out by MultiQC in the final report. Please choose a different label.".format(cols[1])
             assert cols[1] not in labels, "Duplicate sample label {}".format(cols[1])
             labels.append(cols[1])
             # Check the fastq file locations
@@ -35,6 +40,8 @@ def check_design(DesignFileIn, DesignFileOut, Comparison, IgnoreR1):
             # Check the group label
             if cols[0]:
                 assert re.match(legal_pattern, cols[0]), "Group label {} contains illegal characters or does not start with letters!".format(cols[0])
+                for phrase in illegal_patterns:
+                    assert re.search(phrase, cols[0])==None, "Group label {} contains file phrase(s) that may be automatically filtered out by MultiQC in the final report. Please choose a different label.".format(cols[0])
                 groups.append(cols[0])
             assert len(groups)==0 or len(groups) == len(labels), "Group label(s) missing in some but not all samples!"
 
