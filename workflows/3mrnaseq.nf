@@ -249,7 +249,7 @@ workflow RNASEQ3M {
     // Read counting
     featurecounts(umi_dedup.out.bam_dedupped, gtf.collect(), rRNA_gtf.collect().ifEmpty([]))
     merge_featurecounts(featurecounts.out.counts.collect())
-    parse_biotype_qc(featurecounts.out.biotype_counts.collect(), featurecounts.out.biotype_log.collect())
+    parse_biotype_qc(featurecounts.out.biotype_counts.collect(), featurecounts.out.biotype_log.collect(), count_ercc.out.ercc.collect().ifEmpty([]))
     count_genes_detected(merge_featurecounts.out.merged_counts, merge_featurecounts.out.gene_lengths)
 
     // Comparisons

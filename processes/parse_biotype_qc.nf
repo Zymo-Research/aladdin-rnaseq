@@ -8,6 +8,7 @@ process parse_biotype_qc {
     input:
     path counts
     path logs
+    path ercc
 
     output:
     path 'biotype*mqc.json', emit: report
