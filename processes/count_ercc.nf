@@ -14,6 +14,7 @@ process count_ercc {
 
     output:
     path "*.featureCounts.txt*"
+    path "*.featureCounts.txt.summary", emit: ercc
     path "*plot_ERCC.csv", emit: report
     
     script:

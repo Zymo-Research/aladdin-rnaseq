@@ -47,7 +47,7 @@ Control,Sample2,s3://mybucket/this_is_s2_R1.fastq.gz,s3://mybucket/this_is_s2_R2
 Experiment,Sample3,s3://mybucket/that_is_s3_R1.fastq.gz,
 Experiment,Sample4,s3://mybucket/that_be_s4_R1.fastq.gz,
 ```
-The header line must be present and cannot be changed. Sample labels and group names must contain only alphanumerical characters or underscores, and must start with a letter. Full S3 paths of R1 and R2 FASTQ files should be provided. Mixing of paired-end and single-end data is allowed. If you do not wish to carry out comparisons of samples, i.e., DESeq2 and g:Profiler analysis, simply leave the Group column blank (but keep the comma).<br>
+The header line must be present and cannot be changed. Sample labels and group names must contain only alphanumerical characters or underscores, and must start with a letter. Sample labels and group names also cannot start with "R1" or "R2", or include phrases that will be automatically filtered by MultiQC. A list of terms unsuitable for sample or group labels in this pipeline can be viewed in the MultiQC source code [here](https://github.com/ewels/MultiQC/blob/b936a7a6d7050f3edc1ceefe8ae6ecd93865bf66/multiqc/utils/config_defaults.yaml#L150-L284). Full S3 paths of R1 and R2 FASTQ files should be provided. Mixing of paired-end and single-end data is allowed. If you do not wish to carry out comparisons of samples, i.e., DESeq2 and g:Profiler analysis, simply leave the Group column blank (but keep the comma).<br>
 
 ### Using AWS Batch
 ```bash

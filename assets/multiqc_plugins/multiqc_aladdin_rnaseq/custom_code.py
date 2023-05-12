@@ -41,17 +41,17 @@ def plugin_execution_start():
     if 'Trim_Galore' not in config.sp:
         config.update_dict( config.sp, { 'Trim_Galore' : { 'contents': 'This is cutadapt', 'shared': True } } )
     if 'plot_ERCC' not in config.sp:
-        config.update_dict( config.sp, { 'plot_ERCC': { 'fn' : '*plot_ERCC*' } } )
+        config.update_dict( config.sp, { 'plot_ERCC': { 'fn' : '*plot_ERCC.csv' } } )
     if 'plot_sample_distance/heatmap' not in config.sp:
         config.update_dict( config.sp, { 'plot_sample_distance/heatmap': [ {'fn' : '*sample_distance_matrix*'}, {'fn' : '*sample_similarity_matrix*'} ] } )
     if 'plot_sample_distance/pca' not in config.sp:
-        config.update_dict( config.sp, { 'plot_sample_distance/pca': [ {'fn' : '*sample_pca_plot*'}, {'fn' : '*sample_PCA_plot*'}, {'fn' : '*sample_MDS_plot*'}, {'fn' : '*sample_mds_plot*'} ] } )
+        config.update_dict( config.sp, { 'plot_sample_distance/pca': [ {'fn' : '*sample_pca_plot.tsv'}, {'fn' : '*sample_PCA_plot.tsv'}, {'fn' : '*sample_MDS_plot.tsv'}, {'fn' : '*sample_mds_plot.tsv'} ] } )
     if 'plot_gene_heatmap' not in config.sp:
-        config.update_dict( config.sp, { 'plot_gene_heatmap': { 'fn' : '*gene_heatmap*' } } )
+        config.update_dict( config.sp, { 'plot_gene_heatmap': { 'fn' : '*gene_heatmap.tsv' } } )
     if 'DESeq2' not in config.sp:
-        config.update_dict( config.sp, { 'DESeq2' : { 'fn' : '*DESeq_results*' } } )
+        config.update_dict( config.sp, { 'DESeq2' : { 'fn' : '*DESeq_results.tsv' } } )
     if 'gProfiler' not in config.sp:
-        config.update_dict( config.sp, { 'gProfiler' : { 'fn' : '*gProfiler_results*' } } )
+        config.update_dict( config.sp, { 'gProfiler' : { 'fn' : '*gProfiler_results.tsv' } } )
     
     # Some additional filename cleaning
     config.fn_clean_exts.extend([

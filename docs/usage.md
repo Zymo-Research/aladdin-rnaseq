@@ -157,7 +157,7 @@ The `group` identifier should be identical when you have multiple replicates fro
 
 The `sample` identifier should be used to name your samples. That's how they will appear in the report.
 
-These two columns must contain only alphanumerical characters or underscores, and must start with a letter. 
+The contents of these two columns must contain only alphanumerical characters or underscores, must start with a letter, and cannot start with "R1" or "R2". Sample and group labels must also exclude phrases that will be automatically removed by MultiQC. Sample and group label terms unavailable for use in this pipeline can be found [here](https://github.com/ewels/MultiQC/blob/b936a7a6d7050f3edc1ceefe8ae6ecd93865bf66/multiqc/utils/config_defaults.yaml#L150-L284), in the MultiQC source code.
 
 The `read_1` and `read_2` identifiers should be used to specify the locations of FASTQ files for read 1 and 2.
 
