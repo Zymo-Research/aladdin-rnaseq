@@ -7,7 +7,6 @@ params.summary = [:]
 
 // Load functions
 include { parse_protocol } from ('../libs/parse_protocol')
-include { parse_genome; parse_genome as parse_ercc_genome } from ('../libs/parse_genome')
 include { setup_channel } from ('../libs/setup_channel')
 include { check_star_log } from ('../libs/check_star_log')
 include { parse_design } from ('../libs/parse_design')
@@ -15,22 +14,6 @@ include { parse_design } from ('../libs/parse_design')
 /*
  * SET UP CONFIGURATION VARIABLES
  */
-// Genome options
-// Check if genome exists in the config file
-if (params.genome) {
-    params.genome_settings = parse_genome(params.genome, params.genomes_path, params.public_genomes_only)
-} else {
-    exit 1, "--genome is a required input!"
-}
-
-// ERCC settings
-if (params.ercc_spikein) {
-    if (params.public_genomes_only) {
-        exit 1, "--ercc_spikein and --public_genomes_only cannot be used simultaneously."
-    }
-    params.ercc_settings = parse_ercc_genome('ERCC92', params.genomes_path, params.public_genomes_only)
-}
-
 // Parse protocol
 if (params.protocol) {
     params.protocol_settings = parse_protocol(params.protocol, params.protocols_path)
