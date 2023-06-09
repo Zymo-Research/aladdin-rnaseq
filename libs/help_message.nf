@@ -1,5 +1,5 @@
 def help_message() {
-    log.info "Zymo rnaseq v${workflow.manifest.version}"
+    log.info "Aladdin rnaseq v${workflow.manifest.version}"
     log.info """
 
     Usage:
@@ -27,7 +27,7 @@ def help_message() {
 
     Trimming options:
       --protocol                    Library prep protocol(kit) used. This will determine trimming parameters and strandedness.
-                                    Available: Zymo_RiboFree_protocol_v1.3.0, Zymo_RiboFree_protocol_v2.0.0, Zymo_SwitchFree_protocol_v1.1.1
+                                    Available: Zymo_RiboFree_PROTv2, Zymo_RiboFree_PROTv1, Zymo_SwitchFree_PROTv1
       --adapter_overlap [int]       Instructs Trim Galore to require at least this many bp of overlap with adapters to trim a read. Default is 1
       --min_read_length [int]       Instructs Trim Galore to discard reads shorter than this. Default is 20
       --save_trimmed                Save trimmed FastQ file intermediates

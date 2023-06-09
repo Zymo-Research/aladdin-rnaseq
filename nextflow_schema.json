@@ -65,7 +65,7 @@
                     "description": "Library prep protocol/kit used. If your kit is not listed, please use Contact us form to request help or create an issue on the GitHub repo of aladdin-rnaseq.",
                     "hidden": false,
                     "advanced": false,
-                    "enum": ["Zymo_RiboFree_protocol_v1.3.0", "Zymo_RiboFree_protocol_v2.0.0", "Zymo_SwitchFree_protocol_v1.1.1"]
+                    "enum": ["Zymo_RiboFree_PROTv2", "Zymo_RiboFree_PROTv1", "Zymo_SwitchFree_PROTv1"]
                 },
                 "trim_nextseq": {
                     "type": "boolean",
