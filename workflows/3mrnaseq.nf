@@ -72,8 +72,8 @@ include { fastqc } from '../processes/fastqc' addParams(
 include { umi_extract } from '../processes/umitools_extract' addParams(
     publish_dir: "${params.outdir}/umiextract"
 )
-include { trim_galore } from '../processes/trim_galore' addParams(
-    publish_dir: "${params.outdir}/Trim_Galore",
+include { trimming_2step } from '../processes/trim_galore' addParams(
+    publish_dir: "${params.outdir}/trimming_2step",
     save_trimmed: params.save_trimmed,
     protocol_settings: params.protocol_settings,
     trim_nextseq: params.trim_nextseq,
@@ -173,8 +173,7 @@ include { multiqc_3mrna } from "../processes/multiqc" addParams(
     run_name: params.summary["Run Name"],
     ensembl_web: params.genome_settings.ensembl_web,
     deseq2_fdr: params.deseq2_fdr,
-    gprofiler_fdr: params.gprofiler_fdr,
-    ignore_R1: params.ignore_R1
+    gprofiler_fdr: params.gprofiler_fdr
 )
 include { summarize_downloads } from "../processes/summarize_downloads" addParams(
     publish_dir: "${params.outdir}/download_data"
@@ -199,13 +198,13 @@ workflow RNASEQ3M {
     umi_extract(reads)
 
     // Trim only UMI-added Read 2
-    trim_galore(umi_extract.out.umiextracted_reads)
+    trimming_2step(umi_extract.out.umiextracted_reads)
 
     // Alignment and filtering based on alignment rate
     if (params.skip_trimming) {
         star(umi_extract.out.umiextracted_reads, star_index.collect())
     } else {
-        star(trim_galore.out.reads, star_index.collect())
+        star(trimming_2step.out.reads, star_index.collect())
     }
     star.out.bam
         .branch { meta, star_log, bam, bai ->
@@ -243,7 +242,7 @@ workflow RNASEQ3M {
 
     // Software versions
     versions = fastqc.out.version.first()
-                   .mix(umi_extract.out.version.first(), trim_galore.out.version.first(), star.out.version.first(),
+                   .mix(umi_extract.out.version.first(), trimming_2step.out.version.first(), star.out.version.first(),
                         preseq.out.version.first(), rseqc.out.version.first(), qualimap.out.version.first(), featurecounts.out.version.first(),
                         deseq2.out.version, gprofiler.out.version)
     software_versions(versions.flatten().collect())
@@ -251,7 +250,7 @@ workflow RNASEQ3M {
     // Report
     multiqc_3mrna(multiqc_config, \
             fastqc.out.report.collect().ifEmpty([]), \
-            trim_galore.out.report.collect().ifEmpty([]), \
+            trimming_2step.out.report.collect().ifEmpty([]), \
             star.out.report.collect(), \
             parse_dedup_stat.out.dedup_stats.collect().ifEmpty([]), \
             count_ercc.out.report.collect().ifEmpty([]), \

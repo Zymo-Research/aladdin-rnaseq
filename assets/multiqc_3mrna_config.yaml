@@ -27,6 +27,7 @@ module_order:
         path_filters:
             - '*_R2_fastqc.zip'
     - Trim_Galore
+    - trimming_2step
     - star
     - rseqc
     - qualimap
@@ -53,6 +54,8 @@ table_columns_visible:
         percent_duplicates: False
     Trim_Galore:
         percent_trimmed: False
+    cutadapt:
+        percent_trimmed: False
     STAR:
         uniquely_mapped: False
     RSeQC:
@@ -66,6 +69,8 @@ table_columns_placement:
         total_sequences: 900
         percent_gc: 910
     Trim_Galore:
+        percent_pass_filter: 920
+    cutadapt:
         percent_pass_filter: 920
     STAR:
         uniquely_mapped_percent: 930

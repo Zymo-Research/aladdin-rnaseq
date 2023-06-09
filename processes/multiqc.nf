@@ -100,7 +100,7 @@ process multiqc_3mrna {
     echo 'gProfiler_alpha: $params.gprofiler_fdr' >> $multiqc_config
     echo '$ensembl_link' >> $multiqc_config
     multiqc . -f $rtitle $rfilename --config $multiqc_config \\
-        -m fastqc -m Trim_Galore -m star -m rseqc -m preseq -m qualimap -m featureCounts \\
+        -m fastqc -m trimming_2step -m star -m rseqc -m preseq -m qualimap -m featureCounts \\
         -m custom_content -m DESeq2 -m gProfiler -m plot_sample_distance -m plot_gene_heatmap -m plot_ERCC
     """
 }

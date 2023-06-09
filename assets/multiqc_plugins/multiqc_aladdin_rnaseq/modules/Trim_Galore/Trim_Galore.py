@@ -16,7 +16,7 @@ from multiqc.plots import bargraph, linegraph
 from multiqc.modules.base_module import BaseMultiqcModule
 
 # Initialise the logger
-log = logging.getLogger(__name__)
+log = logging.getLogger('multiqc')
 
 class MultiqcModule(BaseMultiqcModule):
     """
