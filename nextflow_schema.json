@@ -39,10 +39,10 @@
                     "description": "Reference genome used to align reads. If your genome is not listed, please use the Contact us form to request help or create an issue on the GitHub repo of aladdin-rnaseq.",
                     "hidden": false,
                     "advanced": false,
-                    "enum": ["Homo_sapiens(GRCh38)", "Mus_musculus(GRCm39)", "Mus_musculus(GRCm38)", "Rattus_norvegicus(mRatBN7.2)",
-                             "Rattus_norvegicus(Rnor_6.0)", "Bos_taurus(ARS-UCD1.2)", "Gallus_gallus(GRCg6a)", "Danio_rerio(GRCz11)", 
-                             "Saccharomyces_cerevisiae(R64-1-1)", "Solanum_lycopersicum(SL3.0)", "Zea_mays(B73_RefGen_v4)", 
-                             "Chlamydomonas_reinhardtii(v5.5)", "Arabidopsis_thaliana(TAIR10)", "Candida_albicans_SC5314(ASM18296v3)"]
+                    "enum": ["Homo_sapiens[GRCh38]", "Mus_musculus[GRCm39]", "Mus_musculus[GRCm38]", "Rattus_norvegicus[mRatBN7.2]",
+                             "Rattus_norvegicus[Rnor_6.0]", "Bos_taurus[ARS-UCD1.2]", "Gallus_gallus[GRCg6a]", "Danio_rerio[GRCz11]", 
+                             "Saccharomyces_cerevisiae[R64-1-1]", "Solanum_lycopersicum[SL3.0]", "Zea_mays[B73_RefGen_v4]", 
+                             "Chlamydomonas_reinhardtii[v5.5]", "Arabidopsis_thaliana[TAIR10]", "Candida_albicans_SC5314[ASM18296v3]"]
                 },
                 "ercc_spikein": {
                     "type": "integer",
