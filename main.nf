@@ -60,7 +60,7 @@ log.info summary.collect { k,v -> "${k.padRight(21)}: $v" }.join("\n")
 // Import appropriate workflow 
 if (params.merged_counts) { // when merged_counts is supplied, it is assumed that only comparison is requested using merged_counts
     include { COMPARISON } from './workflows/comparison' addParams( summary: summary, outdir: outdir )
-} else if (params.protocol == "zymo_3mrna") {
+} else if (params.protocol == "Zymo_SwitchFree_protocol_v1.1.1") {
     include { RNASEQ3M } from './workflows/3mrnaseq' addParams( summary: summary, outdir: outdir )
 } else {
     include { RNASEQ } from './workflows/rnaseq' addParams( summary: summary, outdir: outdir )
@@ -70,7 +70,7 @@ if (params.merged_counts) { // when merged_counts is supplied, it is assumed tha
 workflow {
     if (params.merged_counts) { // when merged_counts is supplied, it is assumed that only comparison is requested using merged_counts
         COMPARISON()
-    } else if (params.protocol == "zymo_3mrna") {
+    } else if (params.protocol == "Zymo_SwitchFree_protocol_v1.1.1") {
         RNASEQ3M()
     } else {
         RNASEQ()

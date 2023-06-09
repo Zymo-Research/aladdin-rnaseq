@@ -25,11 +25,6 @@ This pipeline processes raw data from FastQ inputs ([FastQC](https://www.bioinfo
 * [Docker](https://www.docker.com/) if using `docker` profile
 * Permissions to AWS S3 and Batch resources if using `awsbacth` profile
 
-### Test
-```bash
-nextflow run Zymo-Research/aladdin-rnaseq -profile docker,test
-```
-
 ### Using Docker
 ```bash
 nextflow run Zymo-Research/aladdin-rnaseq \

@@ -6,7 +6,6 @@ Workflow of Zymo-Seq 3' mRNA-Seq
 params.summary = [:]
 
 // Load functions
-include { parse_protocol } from ('../libs/parse_protocol')
 include { setup_channel } from ('../libs/setup_channel')
 include { check_star_log } from ('../libs/check_star_log')
 include { parse_design } from ('../libs/parse_design')
@@ -16,15 +15,18 @@ include { parse_design } from ('../libs/parse_design')
  */
 // Parse protocol
 if (params.protocol) {
-    params.protocol_settings = parse_protocol(params.protocol, params.protocols_path)
-    params.summary['Trimming'] = params.protocol_settings['trimming_text']
-    params.summary['Strandedness'] = params.protocol_settings['strandedness_text']
-    params.summary['Library Prep'] = params.protocol_settings['common_name']
-    // Ensure correct reads and input channels are set up for zymo-seq 3' mRNA data processing without using UMI to dedup
-    params.ignore_R1 = (params.protocol == "zymo_3mrna_nodedup")
+    if (!params.protocols.containsKey(params.protocol)) {
+        exit 1, "The provided protocol '${params.protocol}' is not available in the protocols file. Currently the available protocols are ${params.protocols.keySet().join(", ")}"
+    } else {
+        params.protocol_settings = params.protocols[params.protocol]
+        params.summary['Trimming'] = params.protocol_settings['trimming_text']
+        params.summary['Strandedness'] = params.protocol_settings['strandedness_text']
+        params.summary['Library Prep'] = params.protocol_settings['description']
+    }
 } else {
     exit 1, "--protocol is a required input!"
 }
+
 
 /*
  * SET & VALIDATE INPUT CHANNELS

@@ -27,7 +27,7 @@ def help_message() {
 
     Trimming options:
       --protocol                    Library prep protocol(kit) used. This will determine trimming parameters and strandedness.
-                                    Available: illumina, zymo_ribofree, zymo_3mrna, zymo_3mrna_nodedup, pico. Default: illumina
+                                    Available: Zymo_RiboFree_protocol_v1.3.0, Zymo_RiboFree_protocol_v2.0.0, Zymo_SwitchFree_protocol_v1.1.1
       --adapter_overlap [int]       Instructs Trim Galore to require at least this many bp of overlap with adapters to trim a read. Default is 1
       --min_read_length [int]       Instructs Trim Galore to discard reads shorter than this. Default is 20
       --save_trimmed                Save trimmed FastQ file intermediates
@@ -78,12 +78,5 @@ def help_message() {
       --awsqueue                    The AWSBatch JobQueue that needs to be set when running on AWSBatch
       --awsregion                   The AWS Region for your AWS Batch job to run on
 
-    Cloudfront options:
-      --cloudfront_origin_path      The origin path for Cloudfront
-      --cloudfront_domain_name      The domain name for Cloudfront
-      --cloudfront_private_key_ID   The private key ID for Cloudfront
-      --cloudfront_privateKey       The location of the private key file for Cloudfront, if not provided, download links will not be included in the report
-      --cloudfront_link_duration    The number of days Cloudfront URLs will stay active. Default: 60
-      --deliver_fastqs              Whether to include links to download original FASTQ files. Default: false
     """.stripIndent()
 }
