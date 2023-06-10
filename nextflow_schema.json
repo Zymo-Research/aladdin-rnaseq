@@ -101,7 +101,7 @@
                     "hidden": true,
                     "default": false
                 },
-                "ignoreR1": {
+                "ignore_R1": {
                     "type": "boolean",
                     "description": "Whether to ignore R1 and use R2 as single-end data instead. Has use cases in some kit applications",
                     "hidden": true,
