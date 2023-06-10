@@ -7,12 +7,12 @@ extra_fn_clean_exts:
       pattern: "_R1"
       module:
           - fastqc
-          - trim_galore
+          - trimming_2step
     - type: "truncate"
       pattern: "_R2"
       module:
           - fastqc
-          - trim_galore
+          - trimming_2step
     - '.markDups'
     - '.rseqc'
     - '.ccurve'
@@ -26,7 +26,6 @@ module_order:
     - fastqc:
         path_filters:
             - '*_R2_fastqc.zip'
-    - Trim_Galore
     - trimming_2step
     - star
     - rseqc
@@ -52,8 +51,6 @@ report_section_order:
 table_columns_visible:
     FastQC:
         percent_duplicates: False
-    Trim_Galore:
-        percent_trimmed: False
     cutadapt:
         percent_trimmed: False
     STAR:
@@ -68,8 +65,6 @@ table_columns_placement:
     FastQC:
         total_sequences: 900
         percent_gc: 910
-    Trim_Galore:
-        percent_pass_filter: 920
     cutadapt:
         percent_pass_filter: 920
     STAR:
