@@ -52,10 +52,15 @@ def plugin_execution_start():
         config.update_dict( config.sp, { 'DESeq2' : { 'fn' : '*DESeq_results.tsv' } } )
     if 'gProfiler' not in config.sp:
         config.update_dict( config.sp, { 'gProfiler' : { 'fn' : '*gProfiler_results.tsv' } } )
+    if 'trimming_2step/1st' not in config.sp:
+        config.update_dict( config.sp, { 'trimming_2step/1st': { 'fn' : '*_1st_adapter_trimming_report.txt' } } )
+    if 'trimming_2step/2nd' not in config.sp:
+        config.update_dict( config.sp, { 'trimming_2step/2nd': { 'fn' : '*_2nd_polyA_trimming_report.txt' } } )
     
     # Some additional filename cleaning
     config.fn_clean_exts.extend([
         '_plot_ERCC',
         '_DESeq_results',
-        '_gProfiler_results'
+        '_gProfiler_results',
+        '_trimmed_first'
     ])

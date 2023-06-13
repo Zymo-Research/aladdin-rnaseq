@@ -4,8 +4,6 @@
     "title": "Zymo-Research/aladdin-rnaseq pipeline parameters",
     "description": "Nextflow RNA-Seq analysis pipeline, part of the Zymo Research bioinformatics pipeline catalog",
     "type": "object",
-    "custom_request": true,
-    "custom_request_instruction": "Please provide as much detail as possible for your request. For example, a request for a reference genome should include links to the genome and its annotations; a request for a different protocol should include link to the library prep kit.",
     "definitions": {
         "input_output_options": {
             "title": "Input/output options",
@@ -38,23 +36,13 @@
             "properties": {
                 "genome": {
                     "type": "string",
-                    "description": "Reference genome used to align reads. If your genome is not listed, please use Custom Request box to request help.",
+                    "description": "Reference genome used to align reads. If your genome is not listed, please use the Contact us form to request help or create an issue on the GitHub repo of aladdin-rnaseq.",
                     "hidden": false,
                     "advanced": false,
-                    "custom_request": true,
-                    "choices_json": "https://raw.githubusercontent.com/Zymo-Research/pipeline-resources/main/genomes/rnaseq_aladdin.json"
-                },
-                "genomes_path": {
-                    "type": "string",
-                    "description": "Path to a JSON file listing available reference genomes and their file paths",
-                    "hidden": true,
-                    "default": "https://raw.githubusercontent.com/Zymo-Research/pipeline-resources/main/genomes/rnaseq.json"
-                },
-                "public_genomes_only": {
-                    "type": "boolean",
-                    "description": "Whether to only use public reference genomes",
-                    "hidden": true,
-                    "default": false
+                    "enum": ["Homo_sapiens[GRCh38]", "Mus_musculus[GRCm39]", "Mus_musculus[GRCm38]", "Rattus_norvegicus[mRatBN7.2]",
+                             "Rattus_norvegicus[Rnor_6.0]", "Bos_taurus[ARS-UCD1.2]", "Gallus_gallus[GRCg6a]", "Danio_rerio[GRCz11]", 
+                             "Saccharomyces_cerevisiae[R64-1-1]", "Solanum_lycopersicum[SL3.0]", "Zea_mays[B73_RefGen_v4]", 
+                             "Chlamydomonas_reinhardtii[v5.5]", "Arabidopsis_thaliana[TAIR10]", "Candida_albicans_SC5314[ASM18296v3]"]
                 },
                 "ercc_spikein": {
                     "type": "integer",
@@ -74,17 +62,10 @@
             "properties": {
                 "protocol": {
                     "type": "string",
-                    "description": "Library prep protocol/kit used. If your kit is not listed, please use Custom Request box to request help.",
+                    "description": "Library prep protocol/kit used. If your kit is not listed, please use Contact us form to request help or create an issue on the GitHub repo of aladdin-rnaseq.",
                     "hidden": false,
                     "advanced": false,
-                    "custom_request": true,
-                    "choices_json": "https://raw.githubusercontent.com/Zymo-Research/pipeline-resources/main/protocols/rnaseq.json"
-                },
-                "protocols_path": {
-                    "type": "string",
-                    "description": "Path to a JSON file listing supported library prep protocols",
-                    "hidden": true,
-                    "default": "https://raw.githubusercontent.com/Zymo-Research/pipeline-resources/main/protocols/rnaseq.json"
+                    "enum": ["Zymo_RiboFree_PROTv2", "Zymo_RiboFree_PROTv1", "Zymo_SwitchFree_PROTv1"]
                 },
                 "trim_nextseq": {
                     "type": "boolean",
@@ -117,6 +98,12 @@
                 "skip_trimming": {
                     "type": "boolean",
                     "description": "Whether to skip trimming step completely",
+                    "hidden": true,
+                    "default": false
+                },
+                "ignore_R1": {
+                    "type": "boolean",
+                    "description": "Whether to ignore R1 and use R2 as single-end data instead. Has use cases in some kit applications",
                     "hidden": true,
                     "default": false
                 }

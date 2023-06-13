@@ -1,0 +1,2 @@
+from __future__ import absolute_import
+from .trimming_2step import MultiqcModule

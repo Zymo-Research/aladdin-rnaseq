@@ -29,6 +29,29 @@ if( workflow.profile == 'awsbatch') {
 // --outdir Remove potential trailing slash at the end
 outdir = params.outdir - ~/\/*$/
 
+// Genome options
+// Check if genome exists in the config file
+if (params.genome) {
+    if (!params.genomes.containsKey(params.genome)) {
+        exit 1, "The provided genome '${params.genome}' is not available in the iGenomes file. Currently the available genomes are ${params.genomes.keySet().join(", ")}"
+    } else {
+        params.genome_settings = params.genomes[params.genome]
+        keys = ['star','gtf','bed12','gprofiler','ensembl_web','rRNA_gtf','bacteria','csi_index']
+        for (key in keys) {
+            if (!(key in params.genome_settings.keySet())) {
+                params.genome_settings[key] = false
+            }
+        }
+    }
+} else {
+    exit 1, "--genome is a required input!"
+}
+
+// ERCC settings
+if (params.ercc_spikein) {
+    params.ercc_settings = params.genomes['ERCC92']
+}
+
 // Collect summary
 log.info "Zymo rnaseq v${workflow.manifest.version}"
 def summary = collect_summary(params, workflow)
@@ -37,7 +60,7 @@ log.info summary.collect { k,v -> "${k.padRight(21)}: $v" }.join("\n")
 // Import appropriate workflow 
 if (params.merged_counts) { // when merged_counts is supplied, it is assumed that only comparison is requested using merged_counts
     include { COMPARISON } from './workflows/comparison' addParams( summary: summary, outdir: outdir )
-} else if (params.protocol == "zymo_3mrna") {
+} else if (params.protocol == "Zymo_SwitchFree_PROTv1") {
     include { RNASEQ3M } from './workflows/3mrnaseq' addParams( summary: summary, outdir: outdir )
 } else {
     include { RNASEQ } from './workflows/rnaseq' addParams( summary: summary, outdir: outdir )
@@ -47,7 +70,7 @@ if (params.merged_counts) { // when merged_counts is supplied, it is assumed tha
 workflow {
     if (params.merged_counts) { // when merged_counts is supplied, it is assumed that only comparison is requested using merged_counts
         COMPARISON()
-    } else if (params.protocol == "zymo_3mrna") {
+    } else if (params.protocol == "Zymo_SwitchFree_PROTv1") {
         RNASEQ3M()
     } else {
         RNASEQ()

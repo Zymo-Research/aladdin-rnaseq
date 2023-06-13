@@ -55,3 +55,39 @@ process trim_galore {
         """
     }
 }
+
+process trimming_2step {
+    label 'mid_memory'
+    tag "${meta.name}"
+    publishDir "${params.publish_dir}", mode: 'copy',
+        saveAs: {filename ->
+            if (filename.indexOf("_fastqc") > 0) "FastQC/$filename"
+            else if (filename.indexOf("trimming_report.txt") > 0) "logs/$filename"
+            else if (params.save_trimmed && filename.endsWith("fq.gz")) filename
+            else null
+        }
+
+    when:
+    !params.skip_trimming
+
+    input:
+    tuple val(meta), path(reads)
+
+    output:
+    tuple val(meta), path("*fq.gz"), emit: reads
+    path "*trimming_report.txt", emit: report
+    path "*_fastqc.{zip,html}"
+    path "v_cutadapt.txt", emit: version
+
+    script:
+    cutadapt_quality = params.trim_nextseq ?  '--nextseq-trim 20' : '-q 20'
+    a1 = params.protocol_settings.adapter ? "-a ${params.protocol_settings.adapter}" : ''
+    a2 = params.protocol_settings.adapter2 ? "-a2 ${params.protocol_settings.adapter2}" : ''
+    """
+    cutadapt --version &> v_cutadapt.txt
+    [ ! -f  ${meta.name}_R1.fastq.gz ] && ln -s $reads ${meta.name}_R1.fastq.gz
+    cutadapt -j $task.cpus ${cutadapt_quality} -O ${params.adapter_overlap} $a1 -m ${params.min_read_length} -o ${meta.name}_trimmed_first.fastq.gz ${meta.name}_R1.fastq.gz > ${meta.name}_1st_adapter_trimming_report.txt
+    cutadapt -j $task.cpus ${cutadapt_quality} -O ${params.adapter_overlap} -a \"A{100}\" -m ${params.min_read_length} -o ${meta.name}_trimmed.fq.gz ${meta.name}_trimmed_first.fastq.gz > ${meta.name}_2nd_polyA_trimming_report.txt
+    fastqc --quiet --threads $task.cpus ${meta.name}_trimmed.fq.gz
+    """
+}

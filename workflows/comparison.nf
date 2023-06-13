@@ -8,19 +8,6 @@ params.summary = [:]
 // Load functions
 include { setup_channel } from ('../libs/setup_channel')
 include { parse_design } from ('../libs/parse_design')
-include { parse_genome } from ('../libs/parse_genome')
-
-/*
- * SET UP CONFIGURATION VARIABLES
- */
-// Genome options
-// Check if genome exists in the config file
-if (params.genome) {
-    params.genome_settings = parse_genome(params.genome, params.genomes_path, params.public_genomes_only)
-} else {
-    log.warn "Genome not provided, gProfiler analysis will be skipped."
-    params.genome_settings = [ 'gprofiler': false, 'ensembl_web': false ]
-}
 
 /*
  * SET & VALIDATE INPUT CHANNELS
