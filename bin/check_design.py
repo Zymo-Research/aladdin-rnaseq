@@ -10,7 +10,7 @@ def check_design(DesignFileIn, DesignFileOut, Comparison, IgnoreR1):
     legal_pattern = r"^[a-zA-Z][a-zA-Z0-9_]*$"
     illegal_patterns = ["_tophat", "ReadsPerGene", "_star_aligned", "_fastqc", "_counts", "Aligned", "_slamdunk", "_bismark", "_SummaryStatistics", \
                         "_duprate", "_vep", "ccs", "_NanoStats", "_R1", "_R2", "_trimmed", "_val", "_mqc", "short_summary_", "_summary", "_matrix", \
-                        r"_$", r"^R1", r"^R2", "_plot_ERCC", "_DESeq_results", "_gProfiler_results", "_trimmed_first"]
+                        r"^R1", r"^R2", "_plot_ERCC", "_DESeq_results", "_gProfiler_results", "_trimmed_first"]
     
     with open(DesignFileIn, "r") as fin:
         # Check the header first
