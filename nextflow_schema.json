@@ -405,7 +405,7 @@
             "$ref": "#/definitions/process_skipping_options"
         },
         {
-            "$ref": "#/definitions/comparison_optionss"
+            "$ref": "#/definitions/comparison_options"
         },
         {
             "$ref": "#/definitions/max_job_request_options"
