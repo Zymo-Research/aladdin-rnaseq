@@ -44,7 +44,7 @@ if (params.merged_counts || params.salmon_results) { // when merged_counts or sa
 // Workflow 
 workflow {
     if (params.merged_counts || params.salmon_results) {
-        COMPARISON()
+        COMPARISON_ONLY()
     } else {
         RNASEQ()
     }
