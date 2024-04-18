@@ -8,6 +8,7 @@ import argparse
 import logging
 import json
 import os
+import re
 from collections import defaultdict
 
 # Create a logger
@@ -37,9 +38,11 @@ def get_dedup_stats(dedup_logs):
         # Extract sample name
         sname = os.path.basename(f).split('.')[0]
         with open(f, 'r') as f:
-            lines = f.readlines()
-        input_reads = int(lines[-6].split(' ')[6])
-        output_reads = int(lines[-5].split(' ')[7])
+            content = f.read()
+        m1 = re.search(r"Reads: Input Reads: (\d+)", content)
+        input_reads = int(m1.group(1))
+        m2 = re.search(r"Number of reads out: (\d+)", content)
+        output_reads = int(m2.group(1))
         data[sname]['kept_dedupped'] = output_reads/input_reads
 
     # Add data to the table dict

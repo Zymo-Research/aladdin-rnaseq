@@ -1,6 +1,5 @@
 // Run dupRadar
 params.publish_dir = "dupRadar"
-params.skip_qc = false
 params.skip_dupradar = false
 params.strandedness = 0
 
@@ -18,7 +17,7 @@ process dupradar {
         }
 
     when:
-    !params.skip_qc && !params.skip_dupradar
+    !params.skip_dupradar
 
     input:
     tuple val(meta), path(bam), path(bai)
@@ -34,7 +33,7 @@ process dupradar {
     script:
     paired = meta.single_end ? 'single' : 'paired'
     """
-    dupRadar.r $bam $gtf ${params.strandedness} $paired ${task.cpus}
+    dupRadar.r $bam ${meta.name} $gtf ${params.strandedness} $paired ${task.cpus}
     Rscript -e "write(x=as.character(packageVersion('dupRadar')), file='v_dupRadar.txt')"
     """
 }

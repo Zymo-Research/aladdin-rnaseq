@@ -9,8 +9,8 @@ from multiqc import config
 from multiqc.plots import scatter
 from multiqc.modules.base_module import BaseMultiqcModule
 
-import csv
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
+import pandas as pd
 
 # Initialise the main MultiQC logger
 log = logging.getLogger("multiqc")
@@ -41,12 +41,7 @@ class MultiqcModule(BaseMultiqcModule):
         for f in self.find_log_files("plot_ERCC", filehandles=True):
             self.add_data_source(f)
             # Parse the data file
-            parsed_data = self.parse_ERCC_counts(f["f"], plot_zero_count)
-            if parsed_data:
-                self.plot_ERCC_data[f["s_name"]] = parsed_data
-            else:
-                log.debug("Could not find any ERCC counts in {}".format(f["fn"]))
-                raise UserWarning
+            self.plot_ERCC_data = self.parse_ERCC_counts(f["f"], plot_zero_count)
 
         # Filter out samples matching ignored sample names
         self.plot_ERCC_data = self.ignore_samples(self.plot_ERCC_data)
@@ -56,7 +51,7 @@ class MultiqcModule(BaseMultiqcModule):
             log.debug("Could not find any reports in {}".format(config.analysis_dir))
             raise UserWarning
 
-        log.info("Found {} reports".format(len(self.plot_ERCC_data)))
+        log.info("Found ERCC spike-in data for {} samples.".format(len(self.plot_ERCC_data)))
 
         # Sort the data by sample name, so that tabs are consistent every time.
         self.plot_ERCC_data = OrderedDict(sorted(self.plot_ERCC_data.items()))
@@ -75,7 +70,9 @@ class MultiqcModule(BaseMultiqcModule):
             "yLog": True,
             "data_labels": [{"name": sample, "ylab": ylab} for sample in self.plot_ERCC_data.keys()]
         }
-        scatter_plot_html = scatter.plot(list(self.plot_ERCC_data.values()), pconfig)
+        # Plot data must be a list of dicts
+        plot_data = [{"ERCC transcripts":v} for v in self.plot_ERCC_data.values()]
+        scatter_plot_html = scatter.plot(plot_data, pconfig)
 
         # Add a report section with the line plot
         helptext = "The relative expression levels is calcuated as:"
@@ -92,17 +89,15 @@ class MultiqcModule(BaseMultiqcModule):
     def parse_ERCC_counts(self, filehandle, plot_zero_count):
         ''' Parse the ERCC counts csv file '''
 
-        data = list(csv.DictReader(filehandle, delimiter="\t"))
-        parsed_data = dict()
-        transcripts = []
-        for row in data:
-            if float(row["count"])+int(plot_zero_count) > 0:
-                transcripts.append({
-                    "x": float(row["concentration"]),
-                    "y": (float(row["count"])+int(plot_zero_count)) * 1000 / int(row["length"]),
-                    "name": row["ID"]
-                    })
-        if len(transcripts):
-            parsed_data["ERCC transcripts"] = transcripts
-
+        data = pd.read_csv(filehandle, sep="\t", index_col=0)
+        parsed_data = defaultdict(list)
+        for idx, row in data.iterrows():
+            for col in row.keys():
+                if col not in ["concentration", "length"]:
+                    if float(row[col])+int(plot_zero_count) > 0:
+                        parsed_data[col].append({
+                            "x": float(row["concentration"]),
+                            "y": (float(row[col])+int(plot_zero_count)) * 1000 / int(row["length"]),
+                            "name": idx
+                        })
         return parsed_data

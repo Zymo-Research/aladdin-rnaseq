@@ -2,7 +2,7 @@
 
 """MultiQC plugin module to process gProfiler gene set enrichment results.
 It outputs a table tallying the numbers of up- and down-regulated gene sets and 
-generates tables of top 30 gene sets in each comparison."""
+generates tables of top 20 gene sets in each comparison."""
 
 from __future__ import print_function
 import logging
@@ -125,12 +125,12 @@ class MultiqcModule(BaseMultiqcModule):
         # Reset the table headers
         headers = OrderedDict()
         headers["name"] = {
-                "title": "Term name",
-                "description": "Term name",
+                "title": "Gene set name",
+                "description": "Gene set name",
                 }
         headers["ID"] = {
-                "title": "Term category",
-                "description": "The source of terms"
+                "title": "Gene set category",
+                "description": "The source of gene sets"
                 }
         headers["p_value"] = {
                 "title": "Adjusted p-value",
@@ -138,7 +138,7 @@ class MultiqcModule(BaseMultiqcModule):
                 }
         headers["expression pattern"] = {
                 "title": "Expression pattern",
-                "description": "Expression pattern of the genes in this term"
+                "description": "Expression pattern of the gene set"
                 }
         table_config = {
                 "id": "top_gene_sets_table",
@@ -163,9 +163,9 @@ class MultiqcModule(BaseMultiqcModule):
                 table_config["id"] = "Top_Gene_Sets_"+sample_name
                 table_plot_html = table.plot(table_data, headers, table_config)
                 self.add_section(
-                        name = "Top enriched terms in comparison {} vs. {}".format(cond1, cond2),
+                        name = "Top enriched gene sets in comparison {} vs. {}".format(cond1, cond2),
                         anchor = "top_gene_sets_"+sample_name,
-                        description = ("Top 30 terms, ranked by p-value, in"
+                        description = ("Top 30 gene sets, ranked by p-value, in"
                                        " comparison {} vs. {}. Full g:Profiler "
                                        "results can be downloaded in the "
                                        "[Download data section](#download_data)."
@@ -174,11 +174,11 @@ class MultiqcModule(BaseMultiqcModule):
                         )
             else:
                 self.add_section(
-                        name = "Top enriched terms in comparison {} vs. {}".format(cond1, cond2),
+                        name = "Top enriched gene sets in comparison {} vs. {}".format(cond1, cond2),
                         anchor = "top_gene_sets_"+sample_name,
                         description = ("g:Profiler analysis was not carried out"
                                        " because no gene belonging to the"
-                                       " tested terms were differentially"
+                                       " tested gene set(s) were differentially"
                                        " expressed in comparison {} vs. {}").format(cond1, cond2)
                         )                    
     

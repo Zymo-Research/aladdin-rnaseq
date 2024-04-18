@@ -1,6 +1,5 @@
 // Run Preseq
 params.publish_dir = "preseq"
-params.skip_qc = false
 params.skip_preseq = false
 
 process preseq {
@@ -9,7 +8,7 @@ process preseq {
         saveAs: { it=='v_preseq.txt' ? null : it }
 
     when:
-    !params.skip_qc && !params.skip_preseq
+    !params.skip_preseq
 
     input:
     tuple val(meta), path(bam), path(bai)

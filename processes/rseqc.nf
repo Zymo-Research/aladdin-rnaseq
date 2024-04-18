@@ -1,6 +1,5 @@
 // Run RSeQC for QC
 params.publish_dir = "RSeQC"
-params.skip_qc = false
 params.skip_rseqc = false
 params.csi_index = false
 params.bacteria = false
@@ -36,7 +35,7 @@ process rseqc {
         }
 
     when:
-    !params.skip_qc && !params.skip_rseqc
+    !params.skip_rseqc
 
     input:
     tuple val(meta), path(bam), path(bai)

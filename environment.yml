@@ -7,29 +7,40 @@ channels:
   - defaults
 dependencies:
   ## conda-forge packages
-  - r-base=4.0.2=he766273_1
-  - r-openxlsx=4.2.2=r40h0357c0b_0
-  - r-ggplot2=3.3.2=r40h6115d3f_0
-  - r-ashr=2.2_47=r40h0357c0b_1
-  - r-pheatmap=1.0.12=r40h6115d3f_2
-  - pandas=1.1.5=py37hdc94413_0
-  - matplotlib=3.3.2=0
-  - openpyxl=3.0.5=py_0 # Needed for exporting to EXCEL in python
-  - xorg-libxaw=1.0.13=h516909a_1002 # Needed for jpeg function in R
+  - r-base=4.1.1=hb67fd72_0
+  - r-openxlsx=4.2.4=r41h03ef668_0
+  - r-ggplot2=3.3.5=r41hc72bb7e_0
+  - r-ashr=2.2_47=r41h03ef668_1 # Needed by DESeq2 for Log2FoldChange shrinking
+  - r-pheatmap=1.0.12=r41hc72bb7e_2
+  - r-kernsmooth=2.23_20=r41h742201e_0 # Needed by dupRadar
+  - pandas=2.0.3=py38h01efb38_1
+  - matplotlib=3.3.2=py38h578d9bd_1
+  - scipy=1.10.1=py38h59b608b_3
+  - boto3=1.19.3=pyhd8ed1ab_0
+  - cryptography=3.4.8=py38h3e25421_1
+  - openpyxl=3.0.9=pyhd8ed1ab_0 # Needed for exporting to EXCEL in python
+  - xorg-libxaw=1.0.14=h7f98852_0 # Needed for jpeg function in R
 
   ## bioconda packages, see above
-  - fastqc=0.11.9=0
-  - trim-galore=0.6.6=0
-  - star=2.6.1d=0 # Don't upgrade
-  - umi_tools=1.1.1
-  - samtools=1.9=h10a08f8_12
-  - rseqc=4.0.0=py37hf01694f_0
-  - qualimap=2.2.2a=1
+  - fastqc=0.11.9=hdfd78af_1
+  - trim-galore=0.6.7=hdfd78af_0
+  - star=2.6.1d=h9ee0642_1 # Don't upgrade
+  - umi_tools=1.1.2=py38h4a8c8d9_0
+  - samtools=1.14=hb421002_0
+  - rseqc=4.0.0=py38h4a8c8d9_1
+  - qualimap=2.2.2d=hdfd78af_2
   - preseq=2.0.3=hc216eb9_5
-  - picard=2.23.9=0
-  - bioconductor-dupradar=1.18.0=r40_1
-  - subread=2.0.1=hed695b0_0
-  - bioconductor-limma=3.44.1=r40h037d062_0
-  - bioconductor-deseq2=1.28.0=r40h5f743cb_0
+  - picard=2.26.3=hdfd78af_0
+  - bioconductor-dupradar=1.22.0=r41hdfd78af_0
+  - subread=2.0.1=h5bf99c6_1
+  - stringtie=2.1.7=h978d192_0
+  - bioconductor-limma=3.48.0=r41hd029910_0
+  - bioconductor-deseq2=1.32.0=r41h399db7b_0
   - gprofiler-official=1.0.0=py_0
-  - multiqc=1.9=py_1
+  - salmon=1.5.2=h84f40af_0
+  - bioconductor-tximport=1.20.0=r41hdfd78af_0
+  - bioconductor-dexseq=1.38.0=r41hdfd78af_0
+  - bioconductor-drimseq=1.20.0=r41hdfd78af_0
+  - bioconductor-stager=1.14.0=r41hdfd78af_0
+  - multiqc=1.17=pyhdfd78af_1
+  - bamscale=0.0.5=h380da64_6
