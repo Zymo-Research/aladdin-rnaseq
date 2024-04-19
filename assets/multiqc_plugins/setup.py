@@ -26,7 +26,7 @@ setup(
             'plot_gene_heatmap = multiqc_aladdin_rnaseq.modules.plot_gene_heatmap:MultiqcModule',
             'DESeq2 = multiqc_aladdin_rnaseq.modules.DESeq2:MultiqcModule',
             'gProfiler = multiqc_aladdin_rnaseq.modules.gProfiler:MultiqcModule',
-            'DTU = multiqc_zymo.modules.DTU:MultiqcModule',
+            'DTU = multiqc_aladdin_rnaseq.modules.DTU:MultiqcModule',
             'trimming_2step = multiqc_aladdin_rnaseq.modules.trimming_2step:MultiqcModule'
         ],
         'multiqc.hooks.v1': [
