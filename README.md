@@ -32,7 +32,7 @@ This pipeline processes raw data from FastQ inputs ([FastQC](https://www.bioinfo
 ```bash
 nextflow run Zymo-Research/aladdin-rnaseq \
 	--profile docker \
-	--genome GRCh37 \
+	--genome 'Homo_sapiens[GRCh38]' \
 	--protocol Zymo_RiboFree_PROTv1 \
 	--design "<path to design CSV file>"
 ```
@@ -51,7 +51,7 @@ The header line must be present and cannot be changed. Sample labels and group n
 ```bash
 nextflow run Zymo-Research/aladdin-rnaseq \
 	-profile awsbatch \
-	--genome GRCh37 \
+	--genome 'Homo_sapiens[GRCh38]' \
 	--protocol Zymo_RiboFree_PROTv1 \
 	--design "<path to design CSV file>" \
 	-work-dir "<work dir on S3>" \
