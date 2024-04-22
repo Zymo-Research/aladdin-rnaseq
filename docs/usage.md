@@ -15,18 +15,18 @@
   * [`-profile`](#-profile)
   * [`--design`](#--design)
 * [Reference genomes](#reference-genomes)
-  * [`--genomes_path`](#--genomes_path)
-  * [`--public_genomes_only`](#--public_genomes_only)
   * [`--genome`](#--genome)
   * [`--ercc_spikein`](#--ercc_spikein)
 * [Adapter Trimming](#adapter-trimming)
   * [`--protocol`](#--protocol)
-  * [`--protocols_path`](#--protocols_path)
   * [`--trim_nextseq`](#--trim_nextseq)
   * [`--adapter_overlap [int]`](#--adapter_overlap-int)
   * [`--min_read_length [int]`](#--min_read_length-int)
   * [`--save_trimmed`](#--save_trimmed)
   * [`--skip_trimming`](#--skip_trimming)
+  * [`--skip_bbduk`](#--skip_bbduk)
+  * [`--bbduk_entropy [float]`](#--bbduk_entropy-float)
+  * [`--bbduk_entropy_window [int]`](#--bbduk_entropy_window-int)
 * [Alignment](#--alignment)
   * [`--save_unaligned`](#--save_unaligned)
   * [`--save_secondary_alignments`](#--save_secondary_alignments)
@@ -35,6 +35,7 @@
   * [`--star_twopass`](#--star_twopass)
   * [`--percent_mapped_cutoff [float]`](#--percent_mapped_cutoff-float)
 * [Read Counting](#read-counting)
+  * [`--read_quant_method [str]`](--read_quant_method-str)
   * [`--fc_extra_attributes [str]`](#--fc_extra_attributes-str)
   * [`--fc_group_features [str]`](#--fc_group_features-str)
   * [`--fc_count_type [str]`](#--fc_count_type-str)
@@ -42,13 +43,21 @@
   * [`--fc_biotype_count_type [str]`](#--fc_biotype_count_type-str)
   * [`--skip_biotype_qc`](#--skip_biotype_qc)
   * [`--gene_detection_method [str]`](#--gene_detection_method-str)
-* [Skipping QC steps](#skipping-qc-steps)
+* [Alignment QC](#alignment-qc)
+  * [Skipping QC steps](#skipping-qc-steps)
+  * [`--generate_bigwig](#--generate_bigwig)
 * [Comparisons](#comparisons)
   * [`--skip_deseq2`](#--skip_deseq2)
   * [`--deseq2_fdr [float]`](#--deseq2_fdr-float)
   * [`--deseq2_lfc [float]`](#--deseq2_lfc-float)
   * [`--comparisons`](#--comparisons)
   * [`--gprofiler_fdr [float]`](#--gprofiler_fdr-float)
+  * [`--dtu_analysis`](#--dtu_analysis)
+  * [`--dexseq_fdr [float]`](#--dexseq_fdr-float)
+  * [`--prop_filter_transcript_counts [float]`](#--prop_filter_transcript_counts-float)
+  * [`--prop_filter_transcript_props [float]`](#--prop_filter_transcript_props-float)
+  * [`--prop_filter_gene_counts [float]`](#--prop_filter_gene_counts-float)
+  * [`--heatmap_group_order`](#--heatmap_group_order)
 * [Job resources](#job-resources)
   * [Automatic resubmission](#automatic-resubmission)
   * [Resource allocation](#resource-allocation)
@@ -139,9 +148,6 @@ Use this parameter to choose a configuration profile. Profiles can give configur
 * `docker`
   * A generic configuration profile to be used with [Docker](http://docker.com/)
   * Pulls software from dockerhub: [`nfcore/rnaseq`](http://hub.docker.com/r/nfcore/rnaseq/)
-* `test`
-  * A profile with a complete configuration for automated testing
-  * Includes links to test data so needs no other parameters
 
 When using `awsbatch` profile, one must supply [other options related to AWS batch](#aws-batch-specific-parameters), and supply the locations of [work directory](#-work-dir) and [output directory](#--outdir) on AWS S3.
 
@@ -191,7 +197,7 @@ group,sample,read_1,read_2
 
 ## Reference genomes
 
-Unlike the nfcore/rnaseq pipeline, we store informations about reference genomes at an external location so that we can frequently update them without impacting version control of the pipeline. For this pipeline, the reference genomes information are stored at [our pipeline-resources repo](https://github.com/Zymo-Research/pipeline-resources/blob/main/genomes/rnaseq.json) in JSON format. A explanation of attributes of each genome follows:
+The reference genomes information are stored in [genome config file](../conf/igenomes.config). A explanation of attributes of each genome follows:
 
 | Setting        | Description                                                                    |
 |----------------|--------------------------------------------------------------------------------|
@@ -203,15 +209,8 @@ Unlike the nfcore/rnaseq pipeline, we store informations about reference genomes
 | `ensembl_web`  | The domain of Ensembl website the organism belongs to, if applicable           |
 | `rRNA_gtf`     | Path to a GTF file containing additional rRNA regions                          |
 | `csi_index`    | Indicates building BAM indices using csi, applicable to very long chromosomes  |
-| `public`       | Whether this genome resource is available to the public                        |
 
 We supplemented [AWS iGenomes](https://ewels.github.io/AWS-iGenomes/) with our own genome indices. 
-
-### `--genomes_path`
-You can supply your own genomes file in the same format. Use this option to specify the path of your genomes file.
-
-### `--public_genomes_only`
-If you are using the default genomes file, but you don't have access to Zymo's bucket, you won't be able to access some of the genomes. Use this flag to tell the pipeline to use only public available genomes in the list. If you are using your own genomes file, then this setting should not concern you.
 
 ### `--genome`
 To run the pipeline, you must specify which to use with the `--genome` flag. The genome you specify must be one of the options available in the genomes file, either the default one, or the one you specify.
@@ -222,10 +221,7 @@ Use this option to indicate that ERCC spike-in was added to the samples. Possibl
 ## Adapter Trimming
 
 ### `--protocol`
-Use this to specify which library kit or protocol was used to make the RNAseq library. The possible options can be found in an external file in [our pipeline-resources repo](https://github.com/Zymo-Research/pipeline-resources/blob/main/protocols/rnaseq.json). We have chosen the appropriate trimming parameters such as whether to trim bps off 5' or 3' of R1 or R2 and adapter sequences for these protocols. This is a mandatory option for full RNAseq analysis, but not for comparison only analysis.
-
-### `--protocols_path`
-You can supply your own protocols file using this option here by specifying the path of a JSON file in the same format as the default one. 
+Use this to specify which library kit or protocol was used to make the RNAseq library. The possible options can be found in [protocol config file](../conf/protocols.config). We have chosen the appropriate trimming parameters such as whether to trim bps off 5' or 3' of R1 or R2 and adapter sequences for these protocols. This is a mandatory option for full RNAseq analysis, but not for comparison only analysis.
 
 ### `--trim_nextseq`
 Instructs Trim Galore to apply the --nextseq=20 option, to trim based on quality after removing poly-G tails.
@@ -240,7 +236,16 @@ Instructs Trim Galore to discard reads shorter than this. Default is 20.
 By default, trimmed FastQ files will not be saved to the results directory. Specify this flag to copy these files when complete.
 
 ### `--skip_trimming`
-You can use this option to skip the trimming step, for example, if your input sequences are already trimmed elsewhere.
+You can use this option to skip the trimming step, for example, if your input sequences are already trimmed elsewhere. This also skips the BBDuk step mentioned below.
+
+### `--skip_bbduk`
+By default, the pipeline removes low complexity reads such as those containing mostly just polyAs using BBDuk. You can use this option to skip this step.
+
+### `--bbduk_entropy [float]`
+The entropy threshold used by BBDuk to remove low complexity reads. Default is 0.5. For details on how BBDuk works, see [here](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbduk-guide/)
+
+### `--bbduk_entropy_window [int]`
+The window size in bp that BBDuk uses to calculate entropy. Default is 50bp.
 
 ## Alignment
 
@@ -265,7 +270,10 @@ By default, we don't ask STAR to run two-pass alignment. Two-pass alignment is v
 By default, we filter samples by requiring at least 5% of reads uniquely mapped to genome by STAR. Those samples failing this filter will be discarded after the alignment step. Use this option to change this cutoff.
 
 ## Read Counting
-Read counting is conducted using [featureCounts of the Subread package](http://subread.sourceforge.net/). There are several settings that are critical to get this counting right, and they depend on the attributes used in the annotation GTF file. If you are using a standard ENSEMBL genome, then you don't need to change any of the following options. If you are not, you need to carefully examine your GTF file and change the following option accordingly.
+### `--read_quant_method [str]`
+We offer two ways of conducting read counting, 'STAR_featureCounts' and 'STAR_Salmon'. Both rely on alignments generated by STAR. STAR_featureCounts uses [featureCounts of the Subread package](http://subread.sourceforge.net/) while STAR_Salmon uses [Salmon](https://combine-lab.github.io/salmon/). It is worth noting that we are not using the alignment-free mode of Salmon. The main difference between the two methods are their quantification strategy. featureCounts relies on simple overlap between aligned reads and exons, disards multi-mapped reads. Salmon estimates the number of reads that originate from each transcript, taking into account potential biases. It uses a probabilistic model to assign reads to transcripts, even when reads may map to multiple transcripts. Default is 'STAR_featureCounts'.<br>
+
+For the STAR_featureCounts method, there are several settings that are critical to get this counting right, and they depend on the attributes used in the annotation GTF file. If you are using a standard ENSEMBL genome, then you don't need to change any of the following options. If you are not, you need to carefully examine your GTF file and change the following option accordingly.
 
 ### `--fc_extra_attributes [str]`
 By default, the pipeline uses `gene_name` as additional gene identifiers apart from ENSEMBL identifiers in the pipeline.
@@ -288,7 +296,12 @@ This is the feature to count, equivalent of `--fc_count_type`, but for biotype a
 ### `--skip_biotype_qc`
 Sometimes, the biotype counting and QC step mentioned above may not be possible or useful, for example, some GTF files may have incomplete or no biotype attributes. Use this option to skip the biotype counting step.
 
-## Skipping QC steps
+### `--gene_detection_method [str]`
+Use this option to choose which metrics to use for calculating the numbers of genes detected. Available: `reads`, `fpkm`, `tpm`. Default is `reads`.
+
+## Alignment QC
+
+### Skipping QC steps
 The pipeline contains a large number of quality control steps. Sometimes, it may not be desirable to run all of them if time and compute resources are limited.
 The following options make this easy:
 
@@ -301,8 +314,8 @@ The following options make this easy:
 * `--skip_qualimap` -          Skip Qualimap
 * `--skip_multiqc` -           Skip MultiQC
 
-### `--gene_detection_method [str]`
-Use this option to choose which metrics to use for calculating the numbers of genes detected. Available: `reads`, `fpkm`, `tpm`. Default is `reads`.
+### `--generate_bigwig`
+Use this option to generate genomic coverage bigWig files. If the protocol is stranded, the pipeline will generate two bigWig files for each sample, one for each strand. 
 
 ## Comparisons
 
@@ -310,10 +323,10 @@ Use this option to choose which metrics to use for calculating the numbers of ge
 Use this option to skip DESeq2, and gProfiler by extension. 
 
 ### `--deseq2_fdr [float]`
-Use this option to specify the false discovery rate (FDR) cutoff used in DESeq2. Genes whose FDR is smaller than this will be considered significantly differentially expressed. (Default is `0.05`)
+Use this option to specify the false discovery rate (FDR) cutoff used in DESeq2. Genes whose FDR is smaller than this will be considered significantly differentially expressed. Default is 0.05.
 
 ### `--deseq2_lfc [float]`
-Use this option to specify the fold change cutoff in DESeq2. Please note that this is not a simple filter, this cutoff changes the null hypothesis in the statistical tests, therefore affects the p-values and FDRs in DESeq2. This is passed to DESeq2 as a `Log2FoldChange` parameter, therefore, please use Log2 values of intended fold change cutoff. (Default is `0`)
+Use this option to specify the fold change cutoff in DESeq2. Please note that this is not a simple filter, this cutoff changes the null hypothesis in the statistical tests, therefore affects the p-values and FDRs in DESeq2. This is passed to DESeq2 as a `Log2FoldChange` parameter, therefore, please use Log2 values of intended fold change cutoff. Default is 0.
 
 ### `--comparisons`
 By default, the pipeline will compare all pairwise combinations of sample groups. If this is not desirable, use this option to specify the path to a CSV file that describes which sample groups you want to comapre. The CSV file should have the following format:
@@ -324,8 +337,26 @@ Experiment2,Control
 ```
 The header must be the same as shown. All group labels should also appear in the design CSV file "group" column.
 
-### `gprofiler_fdr [float]`
-Use this option to specify the FDR cutoff used in gProfiler. (Default is `0.05`)
+### `--gprofiler_fdr [float]`
+Use this option to specify the FDR cutoff used in gProfiler. Default is 0.05.
+
+### `--dtu_analysis`
+Use this option to ask the pipeline to conduct Differential Transcript Usage(DTU) analysis, adapted from [this paper](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6178912/).
+
+### `--dexseq_fdr [float]`
+Use this option to specify the FDR cutoff used in DEXSeq in DTU analysis. Default is 0.05
+
+### `--prop_filter_transcript_counts [float]`
+This is a filtering criteria in DTU analysis. This requires a minimum proportion of samples that a transcript must have >=10 reads. Any transcripts below the threshold will be discarded before the statistical analysis. Default is 0.5.
+
+### `--prop_filter_transcript_props [float]`
+This is a filtering criteria in DTU analysis. This requires a minimum proportion of samples that a transcript must have >=10% of the reads of its gene. Any transcripts below the threshold will be discarded before the statistical analysis. Default is 0.5.
+
+### `--prop_filter_gene_counts [float]`
+This is a filtering criteria in DTU analysis. This requires a minimum proportion of samples that the gene of a transcript must have >=10 reads. Any transcripts below the threshold will be discarded before the statistical analysis. Default is 1, meaning a gene and its transcripts must have at least 10 reads in all samples to be included in DTU analysis.
+
+### `--heatmap_group_order`
+Use this option to order the Top Gene Expression Patterns Heatmap by group label instead of similarity between samples.
 
 ## Job resources
 

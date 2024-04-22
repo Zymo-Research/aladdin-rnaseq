@@ -1,4 +1,4 @@
-FROM nfcore/base:1.9
+FROM nfcore/base:2.1
 
 COPY environment.yml /
 

@@ -27,7 +27,7 @@ class MultiqcModule(BaseMultiqcModule):
         # Initialise the parent object
         super(MultiqcModule, self).__init__(
             name='Read Triming',
-            anchor='trimming_2step',
+            anchor='trimming',
             target="",
             info="This section summarizes the results of read trimming including both adapter and poly-A triming."
         )

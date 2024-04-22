@@ -20,6 +20,11 @@
                     "description": "Path to a TSV file with read counts of genes in all samples",
                     "hidden": true
                 },
+                "salmon_results": {
+                    "type": "string",
+                    "description": "Path to a folder containing Salmon quantification results of all samples",
+                    "hidden": true
+                },
                 "outdir": {
                     "type": "string",
                     "description": "The output directory where the results will be saved",
@@ -67,7 +72,8 @@
                     "description": "Library prep protocol/kit used. If your kit is not listed, please use Contact us form to request help or create an issue on the GitHub repo of aladdin-rnaseq.",
                     "hidden": false,
                     "advanced": false,
-                    "enum": ["Zymo_RiboFree_PROTv2", "Zymo_RiboFree_PROTv1", "Zymo_SwitchFree_PROTv1"]
+                    "default": "Zymo_RiboFree_PROTv2",
+                    "enum": ["Zymo_RiboFree_PROTv2", "Zymo_RiboFree_PROTv1", "Zymo_SwitchFree_PROTv1", "Illumina", "Illumina_stranded"]
                 },
                 "trim_nextseq": {
                     "type": "boolean",
@@ -99,15 +105,31 @@
                 },
                 "skip_trimming": {
                     "type": "boolean",
-                    "description": "Whether to skip trimming step completely",
+                    "description": "Whether to skip trimming step completely, this also includes BBDuk step",
                     "hidden": true,
                     "default": false
                 },
-                "ignore_R1": {
+                "skip_bbduk": {
                     "type": "boolean",
-                    "description": "Whether to ignore R1 and use R2 as single-end data instead. Has use cases in some kit applications",
+                    "description": "Whether to skip BBDuk step, which removes reads with low complexity",
                     "hidden": true,
                     "default": false
+                },
+                "bbduk_entropy": {
+                    "type": "number",
+                    "description": "Entropy threshold for removing low complexity reads by BBDuk",
+                    "default": 0.5,
+                    "minimum": 0,
+                    "maximum": 1,
+                    "hidden": false
+                },
+                "bbduk_entropy_window": {
+                    "type": "integer",
+                    "description": "Size of window in bp for calculating entropy in BBDuk",
+                    "default": 50,
+                    "minimum": 20,
+                    "maximum": 100,
+                    "hidden": false
                 }
             },
             "required": ["protocol"]
@@ -166,6 +188,13 @@
             "type": "object",
             "description": "Options to adjust parameters to assign reads to genes",
             "properties": {
+                "read_quant_method": {
+                    "type": "string",
+                    "description": "Method of read quantification. The main difference between the two are that STAR_Salmon uses multi-mapped reads and provide transcript-level quantification while STAR_featureCounts does not.",
+                    "default": "STAR_featureCounts",
+                    "enum": ["STAR_featureCounts", "STAR_Salmon"],
+                    "hidden": true
+                },
                 "fc_extra_attributes": {
                     "type": "string",
                     "description": "Define which extra attributes should also be included in featureCounts output",
@@ -263,6 +292,12 @@
                     "description": "Skip MultiQC",
                     "hidden": true,
                     "default": false
+                },
+                "generate_bigwig": {
+                    "type": "boolean",
+                    "description": "Generate genome coverage bigWig files",
+                    "default": false,
+                    "hidden": true
                 }
             }
         },
@@ -308,6 +343,50 @@
                     "minimum": 0,
                     "maximum": 1,
                     "default": 0.05
+                },
+                "dtu_analysis": {
+                    "type": "boolean",
+                    "description": "Run differential transcript usage analysis",
+                    "default": false,
+                    "hidden": true
+                },
+                "dexseq_fdr": {
+                    "type": "number",
+                    "description": "FDR cutoff for differential transcript usage analysis in DEXSeq",
+                    "default": 0.05,
+                    "minimum": 0,
+                    "maximum": 1,
+                    "hidden": true
+                },
+                "prop_filter_transcript_counts": {
+                    "type": "number",
+                    "description": "Filtering criteria for DTU analysis. Minimum proportion of samples that a transcript must have >=10 reads",
+                    "default": 0.5,
+                    "minimum": 0,
+                    "maximum": 1,
+                    "hidden": true
+                },
+                "prop_filter_transcript_props": {
+                    "type": "number",
+                    "description": "Filtering criteria for DTU analysis. Minimum proportion of samples that a transcript must have >=10% of the reads of its gene",
+                    "default": 0.5,
+                    "minimum": 0,
+                    "maximum": 1,
+                    "hidden": true
+                },
+                "prop_filter_gene_counts": {
+                    "type": "number",
+                    "description": "Filtering criteria for DTU analysis. Minimum proportion of samples that the gene of a transcript must have >=10 reads",
+                    "default": 1,
+                    "minimum": 0,
+                    "maximum": 1,
+                    "hidden": true
+                },
+                "heatmap_group_order": {
+                    "type": "boolean",
+                    "description": "Orders the Top Gene Expression Patterns Heatmap by group label instead of similarity between samples",
+                    "default": false,
+                    "hidden": true
                 }
             }
         },
@@ -358,12 +437,6 @@
                     "description": "Path to a MultiQC config file for RNAseq workflow",
                     "hidden": true,
                     "default": "$baseDir/assets/multiqc_config.yaml"
-                },
-                "multiqc_config_3mrna": {
-                    "type": "string",
-                    "description": "Path to a MultiQC config file for 3'mRNAseq workflow",
-                    "hidden": true,
-                    "default": "$baseDir/assets/multiqc_3mrna_config.yaml"
                 },
                 "tracedir": {
                     "type": "string",

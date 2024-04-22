@@ -36,7 +36,7 @@ class MultiqcModule(BaseMultiqcModule):
         )
 
         # Get the pvalue cutoff from config
-        alpha = getattr(config, "DESeq2_alpha", 0.1)
+        alpha = getattr(config, "DESeq2_alpha", 0.05)
         link_prefix = getattr(config, "gene_link_prefix", None)
         if link_prefix is not None:
             link_prefix = '<a href=\"https://{}/id/'.format(link_prefix)
@@ -247,7 +247,8 @@ class MultiqcModule(BaseMultiqcModule):
         headers = OrderedDict()
         headers["gene_link"] = {
                 "title": "Gene name",
-                "description": "Gene name"
+                "description": "Gene name",
+                "scale": False
                 }
         headers["baseMean"] = {
                 "title": "Mean counts",
@@ -257,20 +258,22 @@ class MultiqcModule(BaseMultiqcModule):
         headers["log2FoldChange"] = {
                 "title": "Log2 Fold change",
                 "description": "Log2 Fold change",
-                "format": "{:,.2f}"
+                "format": "{:,.2f}",
+                "min": -5,
+                "max": 5,
+                "bars_zero_centrepoint": True,
+                "scale": "RdYlBu"
                 }
         headers["padj"] = {
                 "title": "False discovery rate",
                 "description": "False discovery rate",
                 "format": "{:,.1e}",
-                "min": 0,
-                "max": 1
+                "scale": False
                 }
         table_config = {
                 "id": "top_deg_table",
                 "col1_header": "Rank",
-                "sortRows": False,
-                "scale": False
+                "sortRows": False
                 }
         for sample_name, data in self.deseq_results.items():
             cond1, cond2 = sample_name.split("_vs_")

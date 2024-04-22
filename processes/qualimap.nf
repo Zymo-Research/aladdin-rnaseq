@@ -1,6 +1,5 @@
 // Run Qualimap
 params.publish_dir = "Qualimap"
-params.skip_qc = false
 params.skip_qualimap = false
 params.strandedness = 0
 
@@ -11,7 +10,7 @@ process qualimap {
         saveAs: { it=='v_qualimap.txt' ? null : it }
 
     when:
-    !params.skip_qc && !params.skip_qualimap
+    !params.skip_qualimap
 
     input:
     tuple val(meta), path(bam), path(bai)

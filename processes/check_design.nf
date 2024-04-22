@@ -1,5 +1,3 @@
-params.ignore_R1 = false
-
 // Sanity check design file
 process check_design {
     tag "$design"
@@ -10,11 +8,11 @@ process check_design {
 
     output:
     path "checked_${design}", emit: checked_design
+    path "DESeq2_${design}", emit: deseq2_design
 
     script:
     comparison_file = params.comparisons ? "-c $comparisons" : ''
-    ignorer1 = params.ignore_R1 ? "--ignore_r1" : "--no_ignore_r1"
     """
-    check_design.py $comparison_file $ignorer1 $design
+    check_design.py $comparison_file $design
     """
 }

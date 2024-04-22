@@ -164,7 +164,6 @@ class MultiqcModule(BaseMultiqcModule):
         headers['percent_trimmed'] = {
             'title': '% BP Trimmed',
             'description': '% Total Base Pairs trimmed',
-            'namespace': 'Trim_Galore',
             'max': 100,
             'min': 0,
             'suffix': '%',
@@ -173,7 +172,6 @@ class MultiqcModule(BaseMultiqcModule):
         headers['percent_pass_filter'] = {
             'title': '% Reads PF',
             'description': '% Reads pass various length and quality filters',
-            'namespace': 'Trim_Galore',
             'max': 100,
             'min': 0,
             'suffix': '%',

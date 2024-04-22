@@ -41,7 +41,7 @@ def plugin_execution_start():
     if 'Trim_Galore' not in config.sp:
         config.update_dict( config.sp, { 'Trim_Galore' : { 'contents': 'This is cutadapt', 'shared': True } } )
     if 'plot_ERCC' not in config.sp:
-        config.update_dict( config.sp, { 'plot_ERCC': { 'fn' : '*plot_ERCC.csv' } } )
+        config.update_dict( config.sp, { 'plot_ERCC': { 'fn' : 'ERCC_counts_info.tsv' } } )
     if 'plot_sample_distance/heatmap' not in config.sp:
         config.update_dict( config.sp, { 'plot_sample_distance/heatmap': [ {'fn' : '*sample_distance_matrix*'}, {'fn' : '*sample_similarity_matrix*'} ] } )
     if 'plot_sample_distance/pca' not in config.sp:
@@ -49,18 +49,24 @@ def plugin_execution_start():
     if 'plot_gene_heatmap' not in config.sp:
         config.update_dict( config.sp, { 'plot_gene_heatmap': { 'fn' : '*gene_heatmap.tsv' } } )
     if 'DESeq2' not in config.sp:
-        config.update_dict( config.sp, { 'DESeq2' : { 'fn' : '*DESeq_results.tsv' } } )
+        config.update_dict( config.sp, { 'DESeq2' : { 'fn' : '*DESeq_results.tsv', 'shared': True } } )
     if 'gProfiler' not in config.sp:
         config.update_dict( config.sp, { 'gProfiler' : { 'fn' : '*gProfiler_results.tsv' } } )
+    if 'DTU/DESeq2' not in config.sp:
+        config.update_dict( config.sp, { 'DTU/DESeq2' : { 'fn' : '*DESeq_results.tsv', 'shared': True } } )
+    if 'DTU/DEXSeq' not in config.sp:
+        config.update_dict( config.sp, { 'DTU/DEXSeq' : { 'fn' : '*DTU_analysis_DEXSeq_results.tsv' } } )
     if 'trimming_2step/1st' not in config.sp:
         config.update_dict( config.sp, { 'trimming_2step/1st': { 'fn' : '*_1st_adapter_trimming_report.txt' } } )
     if 'trimming_2step/2nd' not in config.sp:
         config.update_dict( config.sp, { 'trimming_2step/2nd': { 'fn' : '*_2nd_polyA_trimming_report.txt' } } )
     
-    # Some additional filename cleaning
-    config.fn_clean_exts.extend([
-        '_plot_ERCC',
-        '_DESeq_results',
-        '_gProfiler_results',
-        '_trimmed_first'
-    ])
+    # Prepend some additional filename cleaning
+    config.fn_clean_exts[0:0] = [
+        '_R1.fastq.gz',
+        '_R2.fastq.gz',
+        '_DESeq_results.tsv',
+        '_gProfiler_results.tsv',
+        '_DTU_analysis_DEXSeq_results.tsv',
+        '_trimmed_first.fastq.gz'
+    ]

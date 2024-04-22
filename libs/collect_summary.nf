@@ -26,13 +26,25 @@ def collect_summary(params, workflow) {
     summary['DESeq2 FDR cutoff']         = params.deseq2_fdr
     summary['DESeq2 Log2FC cutoff']      = params.deseq2_lfc
     summary['gProfiler FDR cutoff']      = params.gprofiler_fdr
-    if (!params.merged_counts) {
+    if (params.dtu_analysis) {
+        summary['DTU analysis FDR cutoff']       = params.dexseq_fdr
+        summary['prop_filter_transcript_counts'] = params.prop_filter_transcript_counts
+        summary['prop_filter_transcript_props']  = params.prop_filter_transcript_props
+        summary['prop_filter_gene_counts']       = params.prop_filter_gene_counts
+    }
+    if (!params.merged_counts && !params.salmon_results) {
         summary['Min Adapter Overlap']   = params.adapter_overlap
         summary['Min Trimmed Length']    = params.min_read_length
         summary['Save Trimmed']          = params.save_trimmed
+        summary['Percent Mapped Cutoff'] = params.percent_mapped_cutoff
+        summary['Read Quant. Method']    = params.read_quant_method
+        summary['Gene Detection Method'] = params.gene_detection_method
         if (params.ercc_spikein) {
             summary['ERCC spike-in']     = "ERCC92 Mix $params.ercc_spikein"
         }
+    } else {
+        summary['Salmon results']        = params.salmon_results
+        summary['Merged read counts']    = params.merged_counts
     }
     return summary
 }

@@ -60,7 +60,7 @@ def mqc_feature_stat(counts_files, features, top_n):
                 for ln in bfl:
                     if ln.startswith('#'):
                         continue
-                    ft, cn = ln.strip().split('\t')
+                    ft, cn = ln.strip().split("\t")
                     fcounts[ft] = float(cn)
         except:
             logger.error("Trouble reading the biocount file {}".format(bfile))
@@ -79,15 +79,6 @@ def mqc_feature_stat(counts_files, features, top_n):
             logger.warning("featureCounts summary file {}.summary NOT found.".format(bfile))
             for k in log_patterns:
                 fcounts[k] = 0
-        # Try to read and parse ERCC featureCounts file
-        if os.path.isfile(sname+'_ERCC.featureCounts.txt.summary'):
-            try:
-                with open(sname+'_ERCC.featureCounts.txt.summary', 'r') as efl:
-                    txt = efl.read()
-                    m = re.search(r"Assigned\t(\d+)", txt)
-                    fcounts['ERCC spike-in'] = float(m.group(1))
-            except:
-                logger.error("Trouble reading the ERCC featureCounts summary file {}_ERCC.featureCounts.txt.summary".format(sname))
         # Calculate total
         total_count = sum(fcounts.values())
         if total_count == 0:
@@ -139,7 +130,7 @@ def mqc_feature_stat(counts_files, features, top_n):
         d = OrderedDict(dict.fromkeys(keep, 0))
         d['others'] = 0
         for k, v in data.items():
-            if k in keep or k in log_patterns or k == 'ERCC spike-in':
+            if k in keep or k in log_patterns:
                 d[k] = v
             else:
                 d['others'] += v

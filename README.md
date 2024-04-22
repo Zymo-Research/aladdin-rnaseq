@@ -6,14 +6,17 @@ This is a bioinformatics analysis pipeline used for bulk RNA sequencing data dev
 * Added differential gene expression analysis
 * Added functional enrichment analysis
 * Added/improved sample overview analysis, such as gene heatmap, MDS plot, etc.
+* Added differential transcript usage analysis
+* Added Salmon as an alternate way of read quantification
 * Improved biotype QC analysis and rRNA reads detection
 * Added ability to handle ERCC spike-ins
 * Added several MultiQC plugins to visualize QC/analysis results
+* Added modules to deal with UMIs within the Zymo-Seq SwitchFree 3′ mRNA Library Kit
 * Compatibility to run on [Aladdin Bioinformatics Platform](http://www.aladdin101.org)
 
 This pipeline is built using [Nextflow](https://www.nextflow.io), a bioinformatics workflow tool to run tasks across multiple compute infrastructures in a very portable manner. It comes with docker containers making installation trivial and results highly reproducible.
 
-This pipeline processes raw data from FastQ inputs ([FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/), [Trim Galore!](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/)), aligns the reads ([STAR](https://github.com/alexdobin/STAR), generates gene counts ([featureCounts](http://bioinf.wehi.edu.au/featureCounts/)), and performs extensive quality-control on the results ([RSeQC](http://rseqc.sourceforge.net/), [Qualimap](http://qualimap.bioinfo.cipf.es/), [Picard](https://broadinstitute.github.io/picard/), [dupRadar](https://bioconductor.org/packages/release/bioc/html/dupRadar.html), [Preseq](http://smithlabresearch.org/software/preseq/)). This pipeline also conducts sample comparison analysis and differential gene expression analysis using [DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html), and a functional enrichment analysis using [g:Profiler](https://biit.cs.ut.ee/gprofiler/gost). All QC and analysis results are visualized in a report using [MultiQC](http://multiqc.info/)).
+This pipeline processes raw data from FastQ inputs ([FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/), [Trim Galore!](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/)), [BBDuk](https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbduk-guide/), aligns the reads ([STAR](https://github.com/alexdobin/STAR), generates gene or transcript read counts ([featureCounts](http://bioinf.wehi.edu.au/featureCounts/) or [Salmon](https://combine-lab.github.io/salmon/)), and performs extensive quality-control on the results ([RSeQC](http://rseqc.sourceforge.net/), [Qualimap](http://qualimap.bioinfo.cipf.es/), [Picard](https://broadinstitute.github.io/picard/), [dupRadar](https://bioconductor.org/packages/release/bioc/html/dupRadar.html), [Preseq](http://smithlabresearch.org/software/preseq/)). This pipeline also conducts sample comparison analysis and differential gene expression analysis using [DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html), and a functional enrichment analysis using [g:Profiler](https://biit.cs.ut.ee/gprofiler/gost). Optionally, the user could choose to run a differential transcript usage analysis modeled after [this paper](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6178912/) ([DEXSeq](https://bioconductor.org/packages/release/bioc/html/DEXSeq.html), [DRIMSeq](https://bioconductor.org/packages/release/bioc/html/DRIMSeq.html), [stageR](https://bioconductor.org/packages/release/bioc/html/stageR.html)). All QC and analysis results are visualized in a report using [MultiQC](http://multiqc.info/)).
 
 ![RNAseq pipeline flowchart](https://zymo-research.github.io/pipeline-resources/images/RNAseq/RNAseq_flowchart.png)
 
@@ -29,8 +32,8 @@ This pipeline processes raw data from FastQ inputs ([FastQC](https://www.bioinfo
 ```bash
 nextflow run Zymo-Research/aladdin-rnaseq \
 	--profile docker \
-	--genome GRCh37 \
-	--protocol zymo_ribofree \
+	--genome 'Homo_sapiens[GRCh38]' \
+	--protocol Zymo_RiboFree_PROTv1 \
 	--design "<path to design CSV file>"
 ```
 1. The parameters `--genome`, and `--protocol` are required. Please refer to [Usage Documentation](docs/usage.md) for available options.
@@ -48,8 +51,8 @@ The header line must be present and cannot be changed. Sample labels and group n
 ```bash
 nextflow run Zymo-Research/aladdin-rnaseq \
 	-profile awsbatch \
-	--genome GRCh37 \
-	--protocol zymo_ribofree \
+	--genome 'Homo_sapiens[GRCh38]' \
+	--protocol Zymo_RiboFree_PROTv1 \
 	--design "<path to design CSV file>" \
 	-work-dir "<work dir on S3>" \
 	--awsqueue "<SQS ARN>" \

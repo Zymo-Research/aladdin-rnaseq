@@ -48,9 +48,15 @@ def summarize_downloads(locations, md5sum, design):
     # Define what to do with each type of files
     categories = {
         '_multiqc_report.html': ('Report', 'report'),
-        'Aligned.sortedByCoord.out.bam' : ('Alignment BAM file', 'samples'),
-        '.markDups.bam' : ('Alignment BAM file', 'samples'),
+        '.genome.primary.bam' : ('Alignment BAM file', 'samples'),
+        ".genome.primary.bam.positive.strandrnaR.bw" : ('Genome Coverage(+ strand)', "samples"),
+        ".genome.primary.bam.negative.strandrnaR.bw" : ('Genome Coverage(- strand)', "samples"),
+        ".genome.primary.bam.rna.bw" : ('Genome Coverage', "samples"),
+        ".dedupped.bam.positive.strandrnaR.bw" : ('Genome Coverage(+ strand)', "samples"),
+        ".dedupped.bam.negative.strandrnaR.bw" : ('Genome Coverage(- strand)', "samples"),
+        ".dedupped.bam.rna.bw" : ('Genome Coverage', "samples"),
         'merged_gene_counts.txt' : ('Raw read counts of genes', 'all_samples'),
+        "merged_transcript_counts.txt" : ('Raw read counts of transcripts', 'all_samples'),
         'normalized_counts.xlsx' : ('Normalized read counts of genes', 'all_samples'),
         'DESeq2_sample_MDS_plot.jpg': ('MDS plot of samples', 'all_samples'),
         'DESeq2_sample_similarity_matrix.jpg': ('Similarity matrix of samples', 'all_samples'),
@@ -58,7 +64,8 @@ def summarize_downloads(locations, md5sum, design):
         '_DESeq_results.xlsx' : ('DEG analysis results', 'comparisons'),
         '_DESeq_MA_plot.jpg' : ('MA plot of genes', 'comparisons'),
         '_DESeq_scatterplot.jpg' : ('Scatter plot of genes', 'comparisons'),
-        '_gProfiler_results.xlsx' : ('Pathway enrichment results', 'comparisons')
+        '_gProfiler_results.xlsx' : ('Pathway enrichment results', 'comparisons'),
+        '_DTU_analysis_DEXSeq_results.xlsx' : ('DTU analysis results', 'comparisons')
     }
 
     # Read the file locations
