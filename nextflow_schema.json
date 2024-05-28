@@ -77,9 +77,9 @@
                 },
                 "trim_nextseq": {
                     "type": "boolean",
-                    "description": "Whether to trim erroneous Gs at 3' end that are common on NextSeq or NovaSeq platforms",
+                    "description": "Whether to trim erroneous Gs at 3' end that are common on NextSeq or NovaSeq platforms. Choose this if your data come from these two platforms.",
                     "hidden": false,
-                    "advanced": true,
+                    "advanced": false,
                     "default": false
                 },
                 "adapter_overlap": {
@@ -121,7 +121,8 @@
                     "default": 0.5,
                     "minimum": 0,
                     "maximum": 1,
-                    "hidden": false
+                    "hidden": false,
+                    "advanced": true
                 },
                 "bbduk_entropy_window": {
                     "type": "integer",
@@ -129,7 +130,8 @@
                     "default": 50,
                     "minimum": 20,
                     "maximum": 100,
-                    "hidden": false
+                    "hidden": false,
+                    "advanced": true
                 }
             },
             "required": ["protocol"]
