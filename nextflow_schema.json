@@ -3,6 +3,16 @@
     "$id": "https://raw.githubusercontent.com/Zymo-Research/aladdin-rnaseq/master/nextflow_schema.json",
     "title": "Zymo-Research/aladdin-rnaseq pipeline parameters",
     "description": "Nextflow RNA-Seq analysis pipeline, part of the Zymo Research bioinformatics pipeline catalog",
+    "metadata_columns": {
+        "type": "object",
+        "properties": {
+            "group": {
+                "type": "string",
+                "description": "Group lables for comparison such as differential gene expression analysis between groups. Alphanumerical characters only. Must start with letter.",
+                "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$"
+            }
+        }
+    },
     "type": "object",
     "definitions": {
         "input_output_options": {
