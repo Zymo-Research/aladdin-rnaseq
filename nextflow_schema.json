@@ -59,7 +59,7 @@
                              "Danio_rerio[GRCz11]", "Saccharomyces_cerevisiae[R64-1-1]", "Solanum_lycopersicum[SL3.0]", "Zea_mays[B73_RefGen_v4]", 
                              "Chlamydomonas_reinhardtii[v5.5]", "Arabidopsis_thaliana[TAIR10]", "Candida_albicans_SC5314[ASM18296v3]",
                              "Aedes_aegypti[AaegL5]", "Aedes_albopictus[AaloF1]", "Culex_quinquefasciatus[CpipJ2]", 
-                             "Salmonella_enterica[ASM950v1]"]
+                             "Salmonella_enterica[ASM950v1]", "Xenopus_tropicalis[UCB_Xtro_10.0]"]
                 },
                 "ercc_spikein": {
                     "type": "integer",
