@@ -456,16 +456,17 @@
                     "hidden": true,
                     "default": "${params.outdir}/pipeline_info"
                 },
-                "awsqueue": {
+                "aladdin_genomes_path": {
                     "type": "string",
-                    "description": "AWS Batch queue to submit jobs to",
+                    "description": "Path to genome assets made for Aladdin",
+                    "default": "s3://aladdin-genomes",
                     "hidden": true
                 },
-                "awsregion": {
+                "igenomes_path": {
                     "type": "string",
-                    "description": "AWS region",
-                    "hidden": true,
-                    "default": "us-east-1"
+                    "description": "Path to genome assets hosted in iGenomes",
+                    "default": "s3://ngi-igenomes/igenomes",
+                    "hidden": true
                 }
             }
         }
