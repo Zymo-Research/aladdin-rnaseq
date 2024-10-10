@@ -27,10 +27,14 @@ process qualimap {
     memory = task.memory.toGiga() + "G"
     """
     frac=\$(samtools idxstats $bam | awk -F '\t' '{s+=\$3} END {frac=10000000/s; if (frac>1) {print "1.0"} else {print frac}}')
-    samtools view -bs \$frac $bam > subsample.bam
-    mv subsample.bam $bam
-    unset DISPLAY
-    qualimap --java-mem-size=${memory} rnaseq -p $qualimap_direction $paired -bam $bam -gtf $gtf -outdir ${meta.name}
+    if [ "\$frac" == "1.0" ]; then
+        unset DISPLAY
+        qualimap --java-mem-size=${memory} rnaseq -p $qualimap_direction $paired -bam $bam -gtf $gtf -outdir ${meta.name}
+    else
+        samtools view -bs \$frac $bam > subsample.bam
+        unset DISPLAY
+        qualimap --java-mem-size=${memory} rnaseq -p $qualimap_direction $paired -bam subsample.bam -gtf $gtf -outdir ${meta.name}
+    fi
     qualimap rnaseq > v_qualimap.txt 2>&1 || true
     """
 }
