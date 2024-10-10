@@ -11,7 +11,9 @@ def check_star_log(star_log, cutoff, log) {
         log.info "#################### VERY POOR ALIGNMENT RATE! IGNORING FOR FURTHER DOWNSTREAM ANALYSIS! ($logname)    >> ${percent_aligned}% <<"
         return false
     } else {
-        log.info "          Passed alignment > star ($logname)   >> ${percent_aligned}% <<"
+        if (cutoff.toFloat() > 0) {
+            log.info "          Passed alignment > star ($logname)   >> ${percent_aligned}% <<"
+        }
         return true
     }
 }
