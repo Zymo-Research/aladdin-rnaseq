@@ -183,7 +183,7 @@ class MultiqcModule(BaseMultiqcModule):
             "marker_line_colour" : { 'DTU':'#7cb5ec', 'DGE':'#90ed7d', 'Both':'#f45b5b', 'Neither':'#434348' },
             "marker_size" : 3,
             "square": True,
-            "data_labels" : [{'name':k} for k in scatterplot_data.keys()]
+            "data_labels" : [{'name':k, "xlab":"-log10 adjusted p-value for DGE", "ylab":"-log10 adjusted p-value for DTU"} for k in scatterplot_data.keys()]
         }
         scatter_plot_html = scatter.plot(list(scatterplot_data.values()), pconfig)
         self.add_section(

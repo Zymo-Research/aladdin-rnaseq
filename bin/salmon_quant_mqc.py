@@ -82,8 +82,12 @@ def parse_salmon_quant_stats(salmon_log, star_log, dedup_log):
     section_dict = {
         'id': 'reads_assigned_STAR_Salmon',
         'section_name': 'Read quantification (STAR_Salmon)',
-        'description': ("This section shows reads assigned to genes by <a href='http://combine-lab.github.io/salmon/'>Salmon</a> "
-                        "from <a href='https://github.com/alexdobin/STAR'>STAR</a> alignments."),
+        'description': ("This section shows reads assigned to transcripts/genes by <a href='http://combine-lab.github.io/salmon/'>Salmon</a> "
+                        "from <a href='https://github.com/alexdobin/STAR'>STAR</a> alignments. The 'not aligned to any transcript' category "
+                        "refers to reads that aligned to the genome, but didn't overlap significantly with any known transcripts, for example, "
+                        "reads derived from intron regions. The 'incorrect read orientation' category refers to paired-end reads that aligned "
+                        "to transcripts, but the orientation of the reads are inconsistent with the library protocol, for example, outward "
+                        "oriented pairs when the library protocol should only produce inward oriented pairs."),
         'plot_type': 'bargraph',
         'anchor': 'salmon_quant',
         'pconfig': {
@@ -93,9 +97,9 @@ def parse_salmon_quant_stats(salmon_log, star_log, dedup_log):
         },
         'data' : {
             sample_name: {
-                'assigned to genes': num_reads_assigned,
+                'assigned to transcripts/genes': num_reads_assigned,
                 'not aligned to any transcript': num_reads_not_transcriptome,
-                'filtered by Salmon': num_reads_filtered
+                'incorrect read orientation': num_reads_filtered
             }
         }
     }
