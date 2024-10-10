@@ -27,6 +27,9 @@ include { dtu_analysis } from '../processes/dtu_analysis' addParams(
     prop_filter_transcript_props: params.prop_filter_transcript_props,
     prop_filter_gene_counts: params.prop_filter_gene_counts
 )
+include { combine_deg_dtu } from '../processes/combine_deg_dtu' addParams(
+    publish_dir: "${params.outdir}/DTU_analysis"
+)
 
 workflow COMPARISON {
     take:
@@ -51,18 +54,20 @@ workflow COMPARISON {
     deseq2(counts.ifEmpty([]), salmon_results.collect().ifEmpty([]), design, comparisons.ifEmpty([]), ch_tx2gene.ifEmpty([]))
     gprofiler(deseq2.out.results)
     dtu_analysis(salmon_results.collect().ifEmpty([]), design, ch_tx2gene.ifEmpty([]), comparisons.ifEmpty([]))
+    combine_deg_dtu(deseq2.out.results, dtu_analysis.out.report)
 
     ch_versions = ch_versions.mix(
         deseq2.out.version, gprofiler.out.version, dtu_analysis.out.version
         )
     ch_multiqc_files = ch_multiqc_files.mix(
-        deseq2.out.report, deseq2.out.results, gprofiler.out.report, dtu_analysis.out.report
+        deseq2.out.report, deseq2.out.results, gprofiler.out.report, dtu_analysis.out.report, combine_deg_dtu.out.report
         )
     deseq2_locations = deseq2.out.download.flatten().map { "${params.outdir}/DESeq2/" + it.getName() }
     gprofiler_locations = gprofiler.out.download.flatten().map { "${params.outdir}/gProfiler/" + it.getName() }
     dtu_locations = dtu_analysis.out.download.flatten().map { "${params.outdir}/DTU_analysis/" + it.getName() }
+    combine_deg_dtu_locations = combine_deg_dtu.out.download.flatten().map { "${params.outdir}/DTU_analysis/" + it.getName() }
     ch_file_locations = ch_file_locations.mix(
-        deseq2_locations, gprofiler_locations, dtu_locations
+        deseq2_locations, gprofiler_locations, dtu_locations, combine_deg_dtu_locations
         )
 
     emit:

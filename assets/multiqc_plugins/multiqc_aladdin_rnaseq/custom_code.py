@@ -49,11 +49,11 @@ def plugin_execution_start():
     if 'plot_gene_heatmap' not in config.sp:
         config.update_dict( config.sp, { 'plot_gene_heatmap': { 'fn' : '*gene_heatmap.tsv' } } )
     if 'DESeq2' not in config.sp:
-        config.update_dict( config.sp, { 'DESeq2' : { 'fn' : '*DESeq_results.tsv', 'shared': True } } )
+        config.update_dict( config.sp, { 'DESeq2' : { 'fn' : '*DESeq_results.tsv' } } )
     if 'gProfiler' not in config.sp:
         config.update_dict( config.sp, { 'gProfiler' : { 'fn' : '*gProfiler_results.tsv' } } )
-    if 'DTU/DESeq2' not in config.sp:
-        config.update_dict( config.sp, { 'DTU/DESeq2' : { 'fn' : '*DESeq_results.tsv', 'shared': True } } )
+    if 'DTU/combined_DEG_DTU' not in config.sp:
+        config.update_dict( config.sp, { 'DTU/combined_DEG_DTU' : { 'fn' : '*combined_DEG_DTU_padj.tsv' } } )
     if 'DTU/DEXSeq' not in config.sp:
         config.update_dict( config.sp, { 'DTU/DEXSeq' : { 'fn' : '*DTU_analysis_DEXSeq_results.tsv' } } )
     if 'trimming_2step/1st' not in config.sp:
@@ -67,6 +67,7 @@ def plugin_execution_start():
         '_R2.fastq.gz',
         '_DESeq_results.tsv',
         '_gProfiler_results.tsv',
+        '_combined_DEG_DTU_padj.tsv',
         '_DTU_analysis_DEXSeq_results.tsv',
         '_trimmed_first.fastq.gz'
     ]

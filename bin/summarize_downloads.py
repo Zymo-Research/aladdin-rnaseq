@@ -65,7 +65,8 @@ def summarize_downloads(locations, md5sum, design):
         '_DESeq_MA_plot.jpg' : ('MA plot of genes', 'comparisons'),
         '_DESeq_scatterplot.jpg' : ('Scatter plot of genes', 'comparisons'),
         '_gProfiler_results.xlsx' : ('Pathway enrichment results', 'comparisons'),
-        '_DTU_analysis_DEXSeq_results.xlsx' : ('DTU analysis results', 'comparisons')
+        '_DTU_analysis_DEXSeq_results.xlsx' : ('DTU analysis results', 'comparisons'),
+        "_combined_DEG_DTU_padj.xlsx" : ('Combined DEG/DTU FDRs', 'comparisons')
     }
 
     # Read the file locations

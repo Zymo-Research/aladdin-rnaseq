@@ -47,10 +47,10 @@ class MultiqcModule(BaseMultiqcModule):
             link_prefix = '<a href=\"https://{}/id/'.format(link_prefix)
         
         # Find and load DESeq2 and DEXSeq results
-        self.deseq_results = dict()
+        self.combined_results = dict()
         self.dexseq_results = dict()
-        for f in self.find_log_files('DTU/DESeq2', filehandles=True):
-            self.parse_deseq_results(f)
+        for f in self.find_log_files('DTU/combined_DEG_DTU', filehandles=True):
+            self.parse_deg_dtu_results(f)
         for f in self.find_log_files('DTU/DEXSeq', filehandles=True):
             self.parse_dexseq_results(f)
         if self.dexseq_results is None:
@@ -61,33 +61,27 @@ class MultiqcModule(BaseMultiqcModule):
         self.write_data_file(self.dexseq_results, 'multiqc_DTU')
 
         # Summary table for DTU
-        if len(self.dexseq_results):
+        if len(self.combined_results):
             self.dtu_summary(dexseq_alpha)
 
         # Scatterplot of DEG and DTU genes
-        if len(self.deseq_results) and len(self.dexseq_results):
+        if len(self.combined_results):
             self.gene_scatterplot(-np.log10(deseq_alpha), -np.log10(dexseq_alpha))
 
         # Table of top DTU genes
         self.top_dtu_table(dexseq_alpha, link_prefix)
-
-    def parse_deseq_results(self, f):
-        """Parse DESeq2 results to get DEG genes and its adjusted p-values"""
+    
+    def parse_deg_dtu_results(self, f):
+        """Read combined DEG DTU results for genes"""
         self.add_data_source(f)
         parsed_data = pd.read_csv(f["f"], sep="\t")
-        try:
-            if 'Gene Name' in parsed_data.columns:
-                self.deseq_results[f["s_name"]] = parsed_data[['Gene ID', 'Gene Name', 'padj']]
-            else:
-                self.deseq_results[f["s_name"]] = parsed_data[['Gene ID', 'padj']]
-        except:
-            log.error("Failed to parse DESeq2 results in {}".format(f['fn']))
+        self.combined_results[f["s_name"]] = parsed_data
 
     def parse_dexseq_results(self, f):
         """Parse DEXSeq results"""
         self.add_data_source(f)
         parsed_data = pd.read_csv(f["f"], sep="\t")
-        cols = ['Gene ID', 'Transcript ID', 'screening_padj','confirmation_padj']
+        cols = ['Gene ID', 'Transcript ID', 'gene_padj', 'transcript_padj']
         for col in cols:
             if col not in parsed_data.columns:
                 log.error("Failed to parse DEXSeq results in {} because missing {} column".format(f['fn'], col))
@@ -96,11 +90,11 @@ class MultiqcModule(BaseMultiqcModule):
     def dtu_summary(self, dexseq_alpha):
         """Make a summary table for DTU analysis"""
         table_data = OrderedDict()
-        for sample_name, dexseq_results in self.dexseq_results.items():
-            dtu_gene_padj = dexseq_results[['Gene ID', 'screening_padj']].drop_duplicates()
+        for sample_name, combined_results in self.combined_results.items():
             table_data[sample_name] = {
-                "not_dtu": (dtu_gene_padj["screening_padj"]>=dexseq_alpha).sum(),
-                "dtu": (dtu_gene_padj["screening_padj"]<dexseq_alpha).sum(),
+                "not_dtu": (combined_results["DTU_padj"]>=dexseq_alpha).sum(),
+                "dtu": (combined_results["DTU_padj"]<dexseq_alpha).sum(),
+                "not_tested": combined_results["DTU_padj"].isna().sum()
             }
         # Configure the table
         headers = OrderedDict()
@@ -111,6 +105,10 @@ class MultiqcModule(BaseMultiqcModule):
         headers["not_dtu"] = {
             "title": "Genes not involved in DTU",
             "description": "Numbers of genes not involved in differential transcript usage"
+        }
+        headers["not_tested"] = {
+            "title": "Genes not tested for DTU",
+            "description": "Numbers of genes not tested for differential transcript usage"
         }
         table_config = {
             "id": "Differential_Transcript_Usage_Table",
@@ -123,9 +121,8 @@ class MultiqcModule(BaseMultiqcModule):
             name = "Summary table of differential transcript usage",
             anchor = "dtu_summary_table",
             description = ("Summary of genes involved in differential transcript usage (DTU) or not in pairwise comparisons. "
-                           "Not all genes are included in this table. Pre-filtering of transcripts were carried out to remove "
+                           "Not all genes are tested for DTU. Pre-filtering were carried out to remove genes with only one transcript, "
                            "transcripts and genes with low read counts or low proportion of expression within the gene. "
-                           "Statistical analysis were not carried out on those genes/transcripts. "
                            "Please see [this paper](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6178912/) for filtering criteria."),
             plot = table_plot_html
         )
@@ -139,32 +136,22 @@ class MultiqcModule(BaseMultiqcModule):
             else:
                 return -np.log10(x)
         scatterplot_data = OrderedDict()
-        # Collect DESeq2 and DEXSeq data, combine and parse
-        for sample_name, dexseq_results in self.dexseq_results.items():
-            group1, group2 = sample_name.split("_vs_")
-            if sample_name in self.deseq_results:
-                deseq_results = self.deseq_results[sample_name]
-            elif "{}_vs_{}".format(group2, group1) in self.deseq_results:
-                deseq_results = self.deseq_results["{}_vs_{}".format(group2, group1)]
-            else:
-                log.debug("DEXSeq comparison {} has no corresponding DESeq2 results. Skipping...".format(sample_name))
-                continue
-            # Combine both DGE and DTU results
-            dtu_gene_padj = dexseq_results[['Gene ID', 'screening_padj']].drop_duplicates()
-            combined_padjs = pd.merge(deseq_results, dtu_gene_padj, on='Gene ID', how='outer').fillna(1)
-            combined_padjs['padj'] = combined_padjs['padj'].apply(transform, min_val=1e-20, jitter_stdev=0.25)
-            combined_padjs['screening_padj'] = combined_padjs['screening_padj'].apply(transform, min_val=1e-20, jitter_stdev=0.25)
+        # Collect combined DEG and DTU data
+        for sample_name, combined_results in self.combined_results.items():
+            combined_results = combined_results.fillna(1)
+            combined_results['DEG_padj'] = combined_results['DEG_padj'].apply(transform, min_val=1e-20, jitter_stdev=0.25)
+            combined_results['DTU_padj'] = combined_results['DTU_padj'].apply(transform, min_val=1e-20, jitter_stdev=0.25)
             # Rename columns for plotting
-            if 'Gene Name' in combined_padjs.columns:
-                combined_padjs = combined_padjs.drop('Gene ID', axis=1)
-                combined_padjs = combined_padjs.rename(columns={'Gene Name':'name', 'padj':'x', 'screening_padj':'y'})
+            if 'Gene Name' in combined_results.columns:
+                combined_results = combined_results.drop('Gene ID', axis=1)
+                combined_results = combined_results.rename(columns={'Gene Name':'name', 'DEG_padj':'x', 'DTU_padj':'y'})
             else:
-                combined_padjs = combined_padjs.rename(columns={'Gene ID':'name', 'padj':'x', 'screening_padj':'y'})
-            # Separate categories, only show 1000 genes for each
-            dtu_only = combined_padjs.loc[(combined_padjs['y']>dexseq_alpha)&(combined_padjs['x']<=deseq_alpha), ].sort_values('y',ascending=False).iloc[:500,]
-            dge_only = combined_padjs.loc[(combined_padjs['y']<=dexseq_alpha)&(combined_padjs['x']>deseq_alpha), ].sort_values('x',ascending=False).iloc[:500,]
-            both = combined_padjs.loc[(combined_padjs['y']>dexseq_alpha)&(combined_padjs['x']>deseq_alpha), ].sort_values(['y','x'],ascending=False).iloc[:500,]
-            neither = combined_padjs.loc[(combined_padjs['y']<=dexseq_alpha)&(combined_padjs['x']<=deseq_alpha), ]
+                combined_results = combined_results.rename(columns={'Gene ID':'name', 'DEG_padj':'x', 'DTU_padj':'y'})
+            # Separate categories, only show 500 genes for each
+            dtu_only = combined_results.loc[(combined_results['y']>dexseq_alpha)&(combined_results['x']<=deseq_alpha), ].sort_values('y',ascending=False).iloc[:500,]
+            dge_only = combined_results.loc[(combined_results['y']<=dexseq_alpha)&(combined_results['x']>deseq_alpha), ].sort_values('x',ascending=False).iloc[:500,]
+            both = combined_results.loc[(combined_results['y']>dexseq_alpha)&(combined_results['x']>deseq_alpha), ].sort_values(['y','x'],ascending=False).iloc[:500,]
+            neither = combined_results.loc[(combined_results['y']<=dexseq_alpha)&(combined_results['x']<=deseq_alpha), ]
             if len(neither) > 100:
                 neither = neither.sample(100)
             # Prepare plot data
@@ -214,15 +201,15 @@ class MultiqcModule(BaseMultiqcModule):
                 "description": "Transcript ID",
                 "scale": False
                 }
-        headers["screening_padj"] = {
-                "title": "Screening adjusted p-value",
-                "description": "Adjusted p-values for the screening stage, i.e. whether a gene is involved in DTU",
+        headers["gene_padj"] = {
+                "title": "Adjusted p-value for gene",
+                "description": "Adjusted p-values for whether a gene is involved in DTU",
                 "format": "{:,.1e}",
                 "scale": False
                 }
-        headers["confirmation_padj"] = {
-                "title": "Confirmation adjusted p-value",
-                "description": "Adjusted p-values for the confirmation stage, i.e. whether a transcript is involved in DTU",
+        headers["transcript_padj"] = {
+                "title": "Adjusted p-value for transcript",
+                "description": "Adjusted p-values for whether a transcript is involved in DTU",
                 "format": "{:,.1e}",
                 "scale": False
                 }
@@ -245,7 +232,7 @@ class MultiqcModule(BaseMultiqcModule):
             group1, group2 = sample_name.split("_vs_")
             # Make a subset of up to top 30 DTU genes
             top30_genes = dexseq_results.drop_duplicates(subset=['Gene ID']).head(30)['Gene ID']
-            plot_data = dexseq_results.loc[(dexseq_results['Gene ID'].isin(top30_genes)) & (dexseq_results['screening_padj']<dexseq_alpha), ]
+            plot_data = dexseq_results.loc[(dexseq_results['Gene ID'].isin(top30_genes)) & (dexseq_results['gene_padj']<dexseq_alpha), ].copy()
             if len(plot_data):
                 # Create a link for the gene and transcript
                 if 'Gene Name' in plot_data.columns:
@@ -258,7 +245,7 @@ class MultiqcModule(BaseMultiqcModule):
                 else:
                     plot_data['gene_link'] = plot_data[gene_label]
                     plot_data['transcript_link'] = plot_data['Transcript ID']
-                plot_data['Log2foldchange'] = plot_data["log2fold_{}_{}".format(group1,group2)]
+                plot_data = plot_data.rename(columns={"log2fold_{}_{}".format(group1,group2):'Log2foldchange'})
                 plot_data = plot_data.to_dict('records')
                 idx_gene = 0
                 idx_transcript = 1
@@ -277,8 +264,9 @@ class MultiqcModule(BaseMultiqcModule):
                     name = "Top genes involved in DTU in comparison {} vs. {}".format(group1, group2),
                     anchor = "top_dtu_genes_"+sample_name,
                     description = ("Top genes and their transcripts involved in DTU, in comparison {} vs. {}. "
-                    "Up to the top 30 genes that passed screening stage are shown here. "
-                    "Adjusted p-values for screening stage and confirmation stages for all transcripts of the same gene are shown. "
+                    "Up to the top 30 genes that are involved in DTU are shown here. "
+                    "Adjusted p-values of the gene and of all transcripts of the same gene are shown. "
+                    "The gene p-values tell whether the gene is involved in DTU while the transcript p-values tell which transcripts of that gene contribute to the DTU."
                     "Transcripts with positive Log2 fold changes have higher expression in {}. "
                     "Transcripts with negative Log2 fold changes have higher expression in {}. "
                     "Please refer to the results file for full list of genes and transcripts.").format(group1, group2, group1, group2),
