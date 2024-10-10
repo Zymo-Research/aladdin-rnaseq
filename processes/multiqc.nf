@@ -9,7 +9,7 @@ params.dexseq_fdr = 0.05
 params.trimming_module = 'Trim_Galore'
 
 process multiqc {
-    label 'no_cache'
+    cache false
     publishDir "${params.publish_dir}", mode: 'copy'
 
     when:
@@ -56,7 +56,7 @@ process multiqc {
 }
 
 process multiqc_comparison_only {
-    label 'no_cache'
+    cache false
     publishDir "${params.publish_dir}", mode: 'copy'
 
     when:
