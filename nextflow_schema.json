@@ -485,7 +485,7 @@
             },
             "then": {
                 "properties": {
-                    "read_quant_method": { "const": "STAR_Salmon" }
+                    "read_quant_method": { "enum": ["STAR_Salmon"] }
                 }
             }
         },
