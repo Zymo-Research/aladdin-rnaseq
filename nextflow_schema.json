@@ -202,10 +202,10 @@
             "properties": {
                 "read_quant_method": {
                     "type": "string",
-                    "description": "Method of read quantification. The main difference between the two are that STAR_Salmon uses multi-mapped reads and provide transcript-level quantification while STAR_featureCounts does not.",
-                    "default": "STAR_featureCounts",
-                    "enum": ["STAR_featureCounts", "STAR_Salmon"],
-                    "hidden": true
+                    "description": "Method of read quantification. The main difference between the two are that STAR_Salmon uses multi-mapped reads and provide transcript-level quantification while STAR_featureCounts does not. STAR_Salmon requires that reads mostly overlap with transcripts, but STAR_featureCounts only requires partial overlap with any exon.",
+                    "default": "STAR_Salmon",
+                    "enum": ["STAR_Salmon", "STAR_featureCounts"],
+                    "hidden": false
                 },
                 "fc_extra_attributes": {
                     "type": "string",
@@ -358,9 +358,9 @@
                 },
                 "dtu_analysis": {
                     "type": "boolean",
-                    "description": "Run differential transcript usage analysis",
+                    "description": "Run differential transcript usage analysis. This does not work for prokaryotes which does not have multiple transcripts per gene.",
                     "default": false,
-                    "hidden": true
+                    "hidden": false
                 },
                 "dexseq_fdr": {
                     "type": "number",
@@ -368,7 +368,8 @@
                     "default": 0.05,
                     "minimum": 0,
                     "maximum": 1,
-                    "hidden": true
+                    "hidden": false,
+                    "advanced": true
                 },
                 "prop_filter_transcript_counts": {
                     "type": "number",
@@ -471,7 +472,23 @@
             }
         }
     },
+    "properties": {
+        "dtu_analysis": { "$ref": "#/definitions/comparison_options/properties/dtu_analysis" },
+        "read_quant_method": { "$ref": "#/definitions/read_counting_options/properties/read_quant_method" }
+    },
     "allOf": [
+        {
+            "if": {
+                "properties": {
+                    "dtu_analysis": { "const": true }
+                }
+            },
+            "then": {
+                "properties": {
+                    "read_quant_method": { "const": "STAR_Salmon" }
+                }
+            }
+        },
         {
             "$ref": "#/definitions/input_output_options"
         },
