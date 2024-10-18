@@ -51,9 +51,9 @@ workflow COMPARISON {
         ch_tx2gene = Channel.empty()
     }
 
-    deseq2(counts.ifEmpty([]), salmon_results.collect().ifEmpty([]), design, comparisons.ifEmpty([]), ch_tx2gene.ifEmpty([]))
+    deseq2(counts, salmon_results, design, comparisons.ifEmpty([]), ch_tx2gene.ifEmpty([]))
     gprofiler(deseq2.out.results)
-    dtu_analysis(salmon_results.collect().ifEmpty([]), design, ch_tx2gene.ifEmpty([]), comparisons.ifEmpty([]))
+    dtu_analysis(salmon_results, design, ch_tx2gene.ifEmpty([]), comparisons.ifEmpty([]))
     combine_deg_dtu(deseq2.out.results, dtu_analysis.out.report)
 
     ch_versions = ch_versions.mix(

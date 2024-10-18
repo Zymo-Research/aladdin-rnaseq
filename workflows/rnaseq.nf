@@ -167,9 +167,16 @@ workflow RNASEQ {
     ALIGNMENT_QC(ALIGN_DEDUP_QUANT.out.bam)
 
     // Comparisons
+    if (params.read_quant_method == "STAR_Salmon") {
+        ch_read_counts = Channel.of([])
+        ch_salmon_results = ALIGN_DEDUP_QUANT.out.salmon_results.collect()
+    } else {
+        ch_read_counts = ALIGN_DEDUP_QUANT.out.counts
+        ch_salmon_results = Channel.of([])
+    }
     COMPARISON(
-        ALIGN_DEDUP_QUANT.out.counts.ifEmpty([]), 
-        ALIGN_DEDUP_QUANT.out.salmon_results.collect().ifEmpty([]),
+        ch_read_counts,
+        ch_salmon_results,
         check_design.out.deseq2_design,
         comparisons.ifEmpty([])
     )
