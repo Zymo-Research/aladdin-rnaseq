@@ -99,7 +99,7 @@ workflow ALIGN_DEDUP_QUANT {
             "The following samples were excluded from analysis due to alignment rate < ${params.percent_mapped_cutoff}%:\n${it.join("; ")}"
         }
         .set { ch_warning_message }
-    ch_warning_message.subscribe { log.error "$it" }
+    ch_warning_message.subscribe { log.warn "$it" }
 
     if (params.protocol_settings.umi) {
         // Dedup bams based on UMI information and collect dedup stats for multiqc report

@@ -9,14 +9,14 @@ params.dexseq_fdr = 0.05
 params.trimming_module = 'Trim_Galore'
 
 process multiqc {
-    label 'no_cache'
+    cache false
     publishDir "${params.publish_dir}", mode: 'copy'
 
     when:
     !params.skip_multiqc
 
     input:
-    path multiqc_config
+    path ('original_multiqc_config.yaml')
     path extra_multiqc_config
     path ('reads_qc_trimming/*')
     path ('align_dedup_quant/*')
@@ -43,25 +43,27 @@ process multiqc {
     cat $summary_header $workflow_summary > workflow_summary_mqc.yaml
     echo '    </dl>' >> workflow_summary_mqc.yaml
     rm $summary_header $workflow_summary
-    echo 'DESeq2_alpha: $params.deseq2_fdr' >> $multiqc_config
-    echo 'gProfiler_alpha: $params.gprofiler_fdr' >> $multiqc_config
-    echo 'DEXSeq_alpha: $params.dexseq_fdr' >> $multiqc_config
-    echo '$ensembl_link' >> $multiqc_config
-    multiqc . -f $rtitle $rfilename --config $multiqc_config $extra_config $comment \\
+    cat original_multiqc_config.yaml > multiqc_config.yaml
+    rm original_multiqc_config.yaml
+    echo 'DESeq2_alpha: $params.deseq2_fdr' >> multiqc_config.yaml
+    echo 'gProfiler_alpha: $params.gprofiler_fdr' >> multiqc_config.yaml
+    echo 'DEXSeq_alpha: $params.dexseq_fdr' >> multiqc_config.yaml
+    echo '$ensembl_link' >> multiqc_config.yaml
+    multiqc . -f $rtitle $rfilename --config multiqc_config.yaml $extra_config $comment \\
         -m fastqc -m ${params.trimming_module} -m bbduk -m star -m rseqc -m preseq -m picard -m qualimap -m featureCounts \\
         -m custom_content -m DESeq2 -m gProfiler -m DTU -m plot_sample_distance -m plot_gene_heatmap -m plot_ERCC
     """
 }
 
 process multiqc_comparison_only {
-    label 'no_cache'
+    cache false
     publishDir "${params.publish_dir}", mode: 'copy'
 
     when:
     !params.skip_multiqc
 
     input:
-    path multiqc_config
+    path ('original_multiqc_config.yaml')
     path ('comparison/*')
     path ('software_versions/*')
     path summary_header
@@ -80,11 +82,13 @@ process multiqc_comparison_only {
     cat $summary_header $workflow_summary > workflow_summary_mqc.yaml
     echo '    </dl>' >> workflow_summary_mqc.yaml
     rm $summary_header $workflow_summary
-    echo 'DESeq2_alpha: $params.deseq2_fdr' >> $multiqc_config
-    echo 'gProfiler_alpha: $params.gprofiler_fdr' >> $multiqc_config
-    echo 'DEXSeq_alpha: $params.dexseq_fdr' >> $multiqc_config
-    echo '$ensembl_link' >> $multiqc_config
-    multiqc . -f $rtitle $rfilename --config $multiqc_config \\
+    cat original_multiqc_config.yaml > multiqc_config.yaml
+    rm original_multiqc_config.yaml
+    echo 'DESeq2_alpha: $params.deseq2_fdr' >> multiqc_config.yaml
+    echo 'gProfiler_alpha: $params.gprofiler_fdr' >> multiqc_config.yaml
+    echo 'DEXSeq_alpha: $params.dexseq_fdr' >> multiqc_config.yaml
+    echo '$ensembl_link' >> multiqc_config.yaml
+    multiqc . -f $rtitle $rfilename --config multiqc_config.yaml \\
         -m custom_content -m DESeq2 -m gProfiler -m DTU -m plot_sample_distance -m plot_gene_heatmap
     """
 }

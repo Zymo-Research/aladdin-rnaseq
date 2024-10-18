@@ -70,6 +70,7 @@ grouping$group <- ifelse(is.na(grouping$group), grouping$sample, grouping$group)
 # Filter groups so that all groups have at least 2 replicates
 no.replicates <- table(grouping$group)
 groups <- names(no.replicates)[no.replicates > 1]
+groups <- sort(groups)
 # Less than 2 groups with replicates, exit gracefully.
 if (length(groups) < 2) {
     message('There are fewer than two groups with replicates. Cannot carry out DTU analysis.')
@@ -139,12 +140,12 @@ for (i in 1:ncol(comparisons)) {
     suppressWarnings({ dex.padj <- getAdjustedPValues(stageRObj, order=TRUE, onlySignificantGenes=FALSE) })
 
     # Combine results and output
-    colnames(dex.padj)[c(3,4)] <- c('screening_padj','confirmation_padj')
-    dxr <- as.data.frame(dxr[, !names(dxr) %in% c('genomicData','countData')])
+    colnames(dex.padj)[c(3,4)] <- c('gene_padj','transcript_padj')
+    dxr <- as.data.frame(dxr[, !names(dxr) %in% c('genomicData','countData', 'pvalue', 'padj')])
     results <- merge(dxr, dex.padj, by.x=c('groupID','featureID'), by.y=c('geneID','txID'), all=TRUE)
     results <- merge(gene_name, results, by.x=0, by.y=1, all.y=TRUE)
     colnames(results)[1:3] <- c('Gene ID', 'Gene Name', 'Transcript ID')
-    results <- results[order(results$screening_padj, results$'Gene ID', results$confirmation_padj),]
+    results <- results[order(results$gene_padj, results$'Gene ID', results$transcript_padj),]
     write.table(results, paste0(g1,'_vs_',g2,'_DTU_analysis_DEXSeq_results.tsv'), sep="\t", quote=FALSE, row.names=FALSE)
     write.xlsx(results, paste0(g1,'_vs_',g2,'_DTU_analysis_DEXSeq_results.xlsx'))
 }

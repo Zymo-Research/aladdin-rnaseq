@@ -4,7 +4,7 @@ params.pipeline_version = "2.1.0"
 params.nextflow_version = "20.07.1"
 
 process software_versions {
-    label 'no_cache'
+    cache false
     publishDir "${params.publish_dir}", mode: 'copy',
         saveAs: { it == "software_versions.csv" ? it : null }
 

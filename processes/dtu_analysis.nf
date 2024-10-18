@@ -17,6 +17,7 @@ process dtu_analysis {
     path ('salmon/*')
     path design_csv
     path ('tx2gene.tsv')
+    path comparisons
 
     output:
     path "*_DTU_analysis_DEXSeq_results.xlsx", emit: download
@@ -25,7 +26,7 @@ process dtu_analysis {
 
     script:
     """
-    DTU.r salmon $design_csv ${params.dexseq_fdr} ${params.prop_filter_transcript_counts} ${params.prop_filter_transcript_props} ${params.prop_filter_gene_counts}
+    DTU.r salmon $design_csv ${params.dexseq_fdr} ${params.prop_filter_transcript_counts} ${params.prop_filter_transcript_props} ${params.prop_filter_gene_counts} $comparisons
     Rscript -e "write(x=as.character(packageVersion('DEXSeq')), file='v_DEXSeq.txt')"
     Rscript -e "write(x=as.character(packageVersion('DRIMSeq')), file='v_DRIMSeq.txt')"
     Rscript -e "write(x=as.character(packageVersion('stageR')), file='v_stageR.txt')"

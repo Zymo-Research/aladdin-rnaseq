@@ -82,6 +82,7 @@ grouping$group <- ifelse(is.na(grouping$group), grouping$sample, grouping$group)
 # Filter groups so that all groups have at least 2 replicates
 no.replicates <- table(grouping$group)
 groups <- names(no.replicates)[no.replicates > 1]
+groups <- sort(groups)
 # Create coldata
 coldata <- data.frame(row.names=grouping$sample, group=grouping$group)
 

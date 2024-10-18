@@ -14,11 +14,11 @@ process star {
     tag "${meta.name}"
     publishDir "${params.publish_dir}", mode: 'copy',
         saveAs: {filename ->
-            if (params.save_unaligned && filename.indexOf('unmapped') > 0) "unmapped/$filename"
+            if (params.save_unaligned && filename.indexOf('unmapped') >= 0) filename
             else if (filename.indexOf('.genome.primary.bam') > 0) filename
             else if (filename.indexOf('toTranscriptome.out.bam') > 0) "transcriptome_bam/$filename"
             else if (params.save_secondary_alignments && filename.indexOf('Aligned.sortedByCoord.out.bam') > 0) "secondary_alignments/$filename"
-            else if (filename.indexOf('.out') > 0) "logs/$filename"
+            else if (filename.indexOf('.out') > 0 && filename.indexOf('.bam') < 0) "logs/$filename"
             else null
         }
 
@@ -31,7 +31,7 @@ process star {
     path "*.out", emit: report
     path "*SJ.out.tab"
     path "*Aligned.sortedByCoord.out.bam"
-    tuple val(meta), path("*unmapped*.fastq.gz"), emit: unmapped optional true
+    tuple val(meta), path("unmapped/*unmapped*.fastq.gz"), emit: unmapped optional true
     tuple val(meta), path("*Log.final.out"), path("*.toTranscriptome.out.bam"), emit: transcriptome_bam optional true
     path "${meta.name}_bam_md5sum.txt", emit: md5sum optional true
     path "v_*.txt", emit: version
@@ -44,13 +44,15 @@ process star {
     two_pass = params.star_twopass ? '--twopassMode Basic' : ''
     transcriptome_bam = params.read_quant_method == 'STAR_Salmon' ? '--quantMode TranscriptomeSAM --quantTranscriptomeBan Singleend' : ''
     if (params.save_unaligned) {
-        gzip_unaligned_r1 = "cat ${meta.name}Unmapped.out.mate1 | gzip > ${meta.name}.unmapped_R1.fastq.gz"
+        mkdir_unaligned = 'mkdir unmapped'
+        gzip_unaligned_r1 = "cat ${meta.name}Unmapped.out.mate1 | gzip > unmapped/${meta.name}.unmapped_R1.fastq.gz"
         if (!meta.single_end) {
-            gzip_unaligned_r2 = "cat ${meta.name}Unmapped.out.mate2 | gzip > ${meta.name}.unmapped_R2.fastq.gz"
+            gzip_unaligned_r2 = "cat ${meta.name}Unmapped.out.mate2 | gzip > unmapped/${meta.name}.unmapped_R2.fastq.gz"
         } else {
             gzip_unaligned_r2 = ''
         }
     } else {
+        mkdir_unaligned = ''
         gzip_unaligned_r1 = ''
         gzip_unaligned_r2 = ''
     }
@@ -68,6 +70,7 @@ process star {
     md5sum ${meta.name}.genome.primary.bam > ${meta.name}_bam_md5sum.txt
     samtools index ${csi_index} ${meta.name}.genome.primary.bam
 
+    $mkdir_unaligned
     $gzip_unaligned_r1
     $gzip_unaligned_r2
 

@@ -36,14 +36,14 @@ if (params.dtu_analysis && (params.genomes[ params.genome ].bacteria ?: false)) 
  */
 if (params.read_quant_method=='STAR_featureCounts') {
     merged_counts = setup_channel(params.merged_counts, "When read_quant_method==STAR_featureCounts, merged read counts", true, "")
-    salmon_results = Channel.empty()
+    salmon_results = Channel.of([])
 } else {
     if (params.salmon_results) {
-        salmon_results = Channel.fromPath(params.salmon_results, type:'dir')
+        salmon_results = Channel.fromPath(params.salmon_results, type:'dir').collect()
     } else {
         exit 1, "When read_quant_method==STAR_Salmon, --salmon_results is a required input!"
     }
-    merged_counts = Channel.empty()
+    merged_counts = Channel.of([])
 }
 design = setup_channel(params.design, "design CSV file", true, "")
 comparisons = setup_channel(params.comparisons, "comparison CSV file", false, "all pairwise comparisons will be carried out.")
@@ -99,8 +99,8 @@ workflow COMPARISON_ONLY {
 
     // Comparisons
     COMPARISON(
-        merged_counts.ifEmpty([]), 
-        salmon_results.collect().ifEmpty([]),
+        merged_counts, 
+        salmon_results,
         check_design.out.deseq2_design,
         comparisons.ifEmpty([])
     )

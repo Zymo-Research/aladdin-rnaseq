@@ -6,7 +6,7 @@ For more information about MultiQC, see http://multiqc.info
 
 from setuptools import setup, find_packages
 
-version = '0.2.0'
+version = '0.3.0'
 
 setup(
     name = 'multiqc_aladdin_rnaseq',
