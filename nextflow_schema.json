@@ -3,6 +3,7 @@
     "$id": "https://raw.githubusercontent.com/Zymo-Research/aladdin-rnaseq/master/nextflow_schema.json",
     "title": "Zymo-Research/aladdin-rnaseq pipeline parameters",
     "description": "Nextflow RNA-Seq analysis pipeline, part of the Zymo Research bioinformatics pipeline catalog",
+    "compatible_clouds": ["awsbatch", "zymohpc"],
     "metadata_columns": {
         "type": "object",
         "properties": {
