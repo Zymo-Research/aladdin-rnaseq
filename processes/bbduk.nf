@@ -34,6 +34,6 @@ process bbduk {
         $entropy \\
         threads=$task.cpus \\
         &> ${meta.name}.bbduk.log
-    bbduk.sh --version &> v_bbduk.txt
+    bbduk.sh -Xmx1g --version &> v_bbduk.txt
     """
 }
