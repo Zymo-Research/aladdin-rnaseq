@@ -58,8 +58,8 @@ workflow ALIGN_DEDUP_QUANT {
 
     // Prepare transcripts file if using Salmon
     if (params.read_quant_method=='STAR_Salmon') {
-        if (params.genomes[ params.genome ].trnascripts) {
-            ch_transcripts = setup_channel(params.genomes[ params.genome ].trnascripts, "transcripts FASTA file", true, "")
+        if (params.genomes[ params.genome ].transcripts) {
+            ch_transcripts = setup_channel(params.genomes[ params.genome ].transcripts, "transcripts FASTA file", true, "")
         } else {
             ch_genome = setup_channel(params.genomes[ params.genome ].fasta, "genome FASTA file", true, "")
             make_transcripts(ch_genome, ch_gtf)
