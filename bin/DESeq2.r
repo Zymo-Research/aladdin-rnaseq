@@ -198,6 +198,8 @@ if (length(groups) > 1) {
         # Shrink the fold change
         reslfc <- lfcShrink(dds, contrast=c("group",cond1,cond2), type="ashr")
         res$lfcShrink <- reslfc$log2FoldChange
+        reslfc$padj <- res$padj
+        reslfc$pvalue <- res$pvalue
         # Add the gene name back in
         res <- merge(gene_name, data.frame(res), by=0, all.y=TRUE)
         # When gene name is missing, default that to gene ID
