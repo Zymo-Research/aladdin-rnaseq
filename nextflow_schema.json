@@ -204,7 +204,7 @@
                 "read_quant_method": {
                     "type": "string",
                     "description": "Method of read quantification. The main difference between the two are that STAR_Salmon uses multi-mapped reads and provide transcript-level quantification while STAR_featureCounts does not. STAR_Salmon requires that reads mostly overlap with transcripts, but STAR_featureCounts only requires partial overlap with any exon.",
-                    "default": "STAR_Salmon",
+                    "default": "STAR_featureCounts",
                     "enum": ["STAR_Salmon", "STAR_featureCounts"],
                     "hidden": false
                 },
@@ -475,7 +475,8 @@
     },
     "properties": {
         "dtu_analysis": { "$ref": "#/definitions/comparison_options/properties/dtu_analysis" },
-        "read_quant_method": { "$ref": "#/definitions/read_counting_options/properties/read_quant_method" }
+        "read_quant_method": { "$ref": "#/definitions/read_counting_options/properties/read_quant_method" },
+        "genome": { "ref": "#/definitions/reference_genome_options/properties/genome" }
     },
     "allOf": [
         {
@@ -487,6 +488,25 @@
             "then": {
                 "properties": {
                     "read_quant_method": { "enum": ["STAR_Salmon"] }
+                }
+            }
+        },
+        {
+            "if": {
+                "properties": {
+                    "read_quant_method": { "const": "STAR_Salmon" }
+                }
+            },
+            "then": {
+                "properties": {
+                    "genome": {
+                        "enum": ["Homo_sapiens[GRCh38]", "Mus_musculus[GRCm39]", "Mus_musculus[GRCm38]", "Rattus_norvegicus[mRatBN7.2]",
+                             "Rattus_norvegicus[Rnor_6.0]", "Bos_taurus[ARS-UCD1.2]", "Gallus_gallus[GRCg6a]", "Drosophila_melanogaster[BDGP6.32]", 
+                             "Danio_rerio[GRCz11]", "Saccharomyces_cerevisiae[R64-1-1]", "Solanum_lycopersicum[SL3.0]", "Zea_mays[B73_RefGen_v4]", 
+                             "Chlamydomonas_reinhardtii[v5.5]", "Arabidopsis_thaliana[TAIR10]", "Aedes_aegypti[AaegL5]", "Aedes_albopictus[AaloF1]", 
+                             "Candida_albicans_SC5314[ASM18296v3]", "Culex_quinquefasciatus[CpipJ2]", "Taeniopygia_guttata[bTaeGut1_v1.p]", 
+                             "Xenopus_tropicalis[UCB_Xtro_10.0]"]
+                    }
                 }
             }
         },
