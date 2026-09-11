@@ -104,7 +104,7 @@ workflow ALIGN_DEDUP_QUANT {
     if (params.protocol_settings.umi) {
         // Dedup bams based on UMI information and collect dedup stats for multiqc report
         umi_dedup(star_out_filtered.pass)
-        parse_dedup_stat(umi_dedup.out.umidedup_log.map{ it[1] }.collect())
+        parse_dedup_stat(umi_dedup.out.umidedup_log.collect())
         ch_versions = ch_versions.mix(umi_dedup.out.version.first())
         ch_multiqc_files = ch_multiqc_files.mix(parse_dedup_stat.out.dedup_stats)
         ch_bam = umi_dedup.out.bam_dedupped
